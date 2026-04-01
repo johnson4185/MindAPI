@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run:*)",
+      "Bash(xargs sed:*)",
+      "Bash(npx next:*)",
+      "Bash(node -e \":*)",
+      "Bash(npx tsc:*)",
+      "Bash(git -C C:/MindAPI/mindapi status)",
+      "Bash(git -C C:/MindAPI status)",
+      "Bash(python3 -c \"import sys; sys.stdout.buffer.write\\(sys.stdin.buffer.read\\(\\)\\)\")",
+      "Bash(python3 \"C:\\\\Users\\\\johns\\\\.claude\\\\projects\\\\c--MindAPI\\\\extract_files.py\")",
+      "Bash(python3 \"C:\\\\Users\\\\johns\\\\.claude\\\\projects\\\\c--MindAPI\\\\check_apid.py\")",
+      "Bash(python3 \"C:\\\\Users\\\\johns\\\\.claude\\\\projects\\\\c--MindAPI\\\\extract_apid.py\")"
+    ],
+    "additionalDirectories": [
+      "C:\\Users\\johns\\.claude\\projects\\c--MindAPI"
+    ]
+  }
+}

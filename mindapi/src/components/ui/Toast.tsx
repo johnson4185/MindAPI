@@ -1,0 +1,12 @@
+'use client'
+import { useStore } from '@/lib/store'
+export default function Toast() {
+  const { toast } = useStore()
+  const bg = toast.type === 'success' ? '#18181B' : toast.type === 'error' ? 'var(--danger)' : '#18181B'
+  return (
+    <div style={{ position: 'fixed', bottom: 24, right: 24, background: bg, color: '#fff', padding: '12px 18px', fontSize: 14, fontWeight: 500, display: 'flex', alignItems: 'center', gap: 10, boxShadow: 'var(--sh-lg)', zIndex: 1000, maxWidth: 380, transform: toast.visible ? 'translateY(0)' : 'translateY(90px)', opacity: toast.visible ? 1 : 0, transition: 'all var(--t-med)', border: '1px solid rgba(255,255,255,0.14)' }}>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M20 6L9 17l-5-5" /></svg>
+      {toast.message}
+    </div>
+  )
+}
