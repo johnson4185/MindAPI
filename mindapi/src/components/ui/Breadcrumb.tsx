@@ -12,19 +12,19 @@ export default function Breadcrumb({ items }: { items: BreadcrumbItem[] }) {
       {items.map((item, i) => (
         <Fragment key={i}>
           {i > 0 && (
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--c-ink5)" strokeWidth="2.5" strokeLinecap="round">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--c-ink-4)" strokeWidth="2.5" strokeLinecap="round">
               <path d="M9 18l6-6-6-6" />
             </svg>
           )}
           {item.href ? (
-            <Link href={item.href} style={{ color: 'var(--c-ink4)', textDecoration: 'none', transition: 'color var(--t-fast)' }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--c-ink2)')}
-              onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--c-ink4)')}
+            <Link href={item.href} style={{ color: 'var(--c-ink-4)', textDecoration: 'none', transition: 'color var(--t-fast)' }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--c-ink-2)')}
+              onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--c-ink-4)')}
             >
               {item.label}
             </Link>
           ) : (
-            <span style={{ color: 'var(--c-ink2)', fontWeight: 600 }}>{item.label}</span>
+            <span style={{ color: 'var(--c-ink-2)', fontWeight: 600 }}>{item.label}</span>
           )}
         </Fragment>
       ))}

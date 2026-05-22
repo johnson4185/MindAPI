@@ -1,6 +1,8 @@
 import {
   API,
+  AlertRule,
   AnalyticsSnapshot,
+  BillingSnapshot,
   Consumer,
   ConsumerKey,
   ConsumerSubscription,
@@ -8,6 +10,9 @@ import {
   GovernancePolicy,
   LogEntry,
   PortalSnapshot,
+  ServiceHealth,
+  WebhookDelivery,
+  WebhookEndpoint,
   WorkspaceSnapshot,
 } from './types'
 
@@ -123,5 +128,99 @@ export const MOCK_WORKSPACE: WorkspaceSnapshot = {
     { item: 'Free plan overage', note: 'Usage threshold messaging only', value: '$0' },
     { item: 'Pro subscriptions', note: 'Recurring monthly contracts', value: '$11,970' },
     { item: 'Enterprise contracts', note: 'Committed annual billing', value: '$84,000 ARR' },
+  ],
+}
+
+export const PRICING = [
+  { name: 'Free', monthly: 0, apiLimit: 3, requests: '100K', seats: 3 },
+  { name: 'Starter', monthly: 99, apiLimit: 25, requests: '1M', seats: 10 },
+  { name: 'Growth', monthly: 499, apiLimit: 150, requests: '20M', seats: 50 },
+  { name: 'Enterprise', monthly: 2500, apiLimit: 'Unlimited', requests: 'Custom', seats: 'Unlimited' },
+]
+
+export const MOCK_WEBHOOKS: WebhookEndpoint[] = [
+  {
+    id: 'webhook-1',
+    name: 'Payment Events',
+    url: 'https://hooks.acme.com/payments',
+    events: ['payment.completed', 'payment.failed', 'payment.refunded'],
+    secret: 'whsec_abc123...',
+    status: 'Active',
+    lastDelivery: '2 min ago',
+    successRate: 99.2,
+    createdAt: 'Jan 15, 2024',
+  },
+  {
+    id: 'webhook-2',
+    name: 'User Provisioning',
+    url: 'https://hooks.techinnovate.io/users',
+    events: ['user.created', 'user.updated', 'user.deleted'],
+    secret: 'whsec_def456...',
+    status: 'Active',
+    lastDelivery: '18 min ago',
+    successRate: 97.8,
+    createdAt: 'Mar 8, 2024',
+  },
+  {
+    id: 'webhook-3',
+    name: 'Inventory Alerts',
+    url: 'https://hooks.megalogistics.net/stock',
+    events: ['stock.low', 'stock.out'],
+    secret: 'whsec_ghi789...',
+    status: 'Failing',
+    lastDelivery: '2 hours ago',
+    successRate: 72.4,
+    createdAt: 'Nov 22, 2023',
+  },
+  {
+    id: 'webhook-4',
+    name: 'Analytics Export',
+    url: 'https://hooks.startup.co/reports',
+    events: ['report.generated', 'report.failed'],
+    secret: 'whsec_jkl012...',
+    status: 'Disabled',
+    lastDelivery: 'Never',
+    successRate: 100,
+    createdAt: 'Jun 5, 2024',
+  },
+]
+
+export const MOCK_WEBHOOK_DELIVERIES: WebhookDelivery[] = [
+  { id: 'del-1', webhookId: 'webhook-1', event: 'payment.completed', url: 'https://hooks.acme.com/payments', status: 200, responseTime: '234ms', timestamp: '14:32:01', success: true },
+  { id: 'del-2', webhookId: 'webhook-1', event: 'payment.failed', url: 'https://hooks.acme.com/payments', status: 200, responseTime: '187ms', timestamp: '14:28:44', success: true },
+  { id: 'del-3', webhookId: 'webhook-3', event: 'stock.low', url: 'https://hooks.megalogistics.net/stock', status: 502, responseTime: '5200ms', timestamp: '12:15:10', success: false },
+  { id: 'del-4', webhookId: 'webhook-2', event: 'user.created', url: 'https://hooks.techinnovate.io/users', status: 200, responseTime: '92ms', timestamp: '14:15:03', success: true },
+  { id: 'del-5', webhookId: 'webhook-3', event: 'stock.out', url: 'https://hooks.megalogistics.net/stock', status: 504, responseTime: '12001ms', timestamp: '11:48:32', success: false },
+]
+
+export const MOCK_ALERT_RULES: AlertRule[] = [
+  { id: 'alert-rule-1', name: 'High Error Rate', metric: 'error_rate', condition: '>', threshold: 5, duration: '5m', severity: 'Critical', channels: ['email', 'pagerduty', 'slack'], enabled: true, lastTriggered: '2 hours ago' },
+  { id: 'alert-rule-2', name: 'Latency Spike', metric: 'p95_latency', condition: '>', threshold: 500, duration: '10m', severity: 'Warning', channels: ['email', 'slack'], enabled: true, lastTriggered: '1 day ago' },
+  { id: 'alert-rule-3', name: 'Traffic Anomaly', metric: 'request_rate', condition: '+/-', threshold: 50, duration: '5m', severity: 'Info', channels: ['slack'], enabled: false, lastTriggered: null },
+  { id: 'alert-rule-4', name: 'Quota Exceeded', metric: 'usage_percent', condition: '>', threshold: 90, duration: '1h', severity: 'Warning', channels: ['email'], enabled: true, lastTriggered: '3 days ago' },
+]
+
+export const MOCK_SERVICES: ServiceHealth[] = [
+  { id: 'svc-payments', name: 'payments-api', status: 'Healthy', uptime: '99.98%', latency: '128ms', lastIncident: '12 days ago', region: 'us-east-1' },
+  { id: 'svc-users', name: 'user-service', status: 'Healthy', uptime: '99.99%', latency: '42ms', lastIncident: '34 days ago', region: 'us-east-1' },
+  { id: 'svc-inventory', name: 'inventory-api', status: 'Degraded', uptime: '98.72%', latency: '312ms', lastIncident: '2 hours ago', region: 'us-west-2' },
+  { id: 'svc-notifications', name: 'notification-svc', status: 'Healthy', uptime: '99.94%', latency: '86ms', lastIncident: '8 days ago', region: 'eu-west-1' },
+  { id: 'svc-analytics', name: 'analytics-api', status: 'Maintenance', uptime: '97.12%', latency: '—', lastIncident: 'Ongoing', region: 'us-east-1' },
+  { id: 'svc-gateway', name: 'api-gateway', status: 'Healthy', uptime: '99.97%', latency: '12ms', lastIncident: '5 days ago', region: 'global' },
+]
+
+export const MOCK_BILLING: BillingSnapshot = {
+  currentPlan: 'Growth',
+  monthlySpend: '$499.00',
+  projectedOverage: '$24.00',
+  usage: {
+    apis: { used: 68, limit: 150 },
+    requests: { used: 13800000, limit: 20000000, period: 'Apr 2026' },
+    seats: { used: 27, limit: 50 },
+  },
+  invoices: [
+    { id: 'inv_0426_01', date: 'Apr 01, 2026', amount: '$499.00', status: 'Paid' },
+    { id: 'inv_0326_01', date: 'Mar 01, 2026', amount: '$499.00', status: 'Paid' },
+    { id: 'inv_0226_01', date: 'Feb 01, 2026', amount: '$499.00', status: 'Paid' },
   ],
 }

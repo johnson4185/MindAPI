@@ -1,7 +1,8 @@
 export type Environment = 'Production' | 'Staging' | 'Development'
 export type APIStatus = 'Active' | 'Draft' | 'Deprecated' | 'Inactive'
 export type ConsumerStatus = 'Active' | 'Suspended'
-export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
+export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'OPTIONS' | 'HEAD'
+export type UserRole = 'Owner' | 'Admin' | 'Developer' | 'Viewer' | 'Billing'
 
 export interface API {
   id: string
@@ -149,4 +150,105 @@ export interface WorkspaceSnapshot {
     note: string
     value: string
   }>
+  currentPlan?: 'Free' | 'Starter' | 'Growth' | 'Enterprise'
+  monthlySpend?: string
+  projectedOverage?: string
+  usage?: {
+    apis: { used: number; limit: number | null }
+    requests: { used: number; limit: number | null; period: string }
+    seats: { used: number; limit: number | null }
+  }
+  invoices?: Array<{
+    id: string
+    date: string
+    amount: string
+    status: 'Paid' | 'Open' | 'Failed'
+  }>
+}
+
+export interface BillingSnapshot {
+  currentPlan: 'Free' | 'Starter' | 'Growth' | 'Enterprise'
+  monthlySpend: string
+  projectedOverage: string
+  usage: {
+    apis: { used: number; limit: number | null }
+    requests: { used: number; limit: number | null; period: string }
+    seats: { used: number; limit: number | null }
+  }
+  invoices: Array<{
+    id: string
+    date: string
+    amount: string
+    status: 'Paid' | 'Open' | 'Failed'
+  }>
+}
+
+export interface TenantWorkspace {
+  id: string
+  slug: string
+  name: string
+  plan: 'Free' | 'Starter' | 'Growth' | 'Enterprise'
+}
+
+export interface PlatformUser {
+  id: string
+  name: string
+  email: string
+  role: UserRole
+}
+
+export interface WebhookEndpoint {
+  id: string
+  name: string
+  url: string
+  events: string[]
+  secret: string
+  status: 'Active' | 'Disabled' | 'Failing'
+  lastDelivery: string
+  successRate: number
+  createdAt: string
+}
+
+export interface WebhookDelivery {
+  id: string
+  webhookId: string
+  event: string
+  url: string
+  status: number
+  responseTime: string
+  timestamp: string
+  success: boolean
+}
+
+export interface AlertRule {
+  id: string
+  name: string
+  metric: string
+  condition: string
+  threshold: number
+  duration: string
+  severity: 'Critical' | 'Warning' | 'Info'
+  channels: string[]
+  enabled: boolean
+  lastTriggered: string | null
+}
+
+export interface ServiceHealth {
+  id: string
+  name: string
+  status: 'Healthy' | 'Degraded' | 'Down' | 'Maintenance'
+  uptime: string
+  latency: string
+  lastIncident: string
+  region: string
+}
+
+export interface MonitoringSnapshot {
+  services: ServiceHealth[]
+  summary: {
+    total: number
+    healthy: number
+    degraded: number
+    down: number
+  }
 }

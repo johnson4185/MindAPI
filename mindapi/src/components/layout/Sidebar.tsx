@@ -2,90 +2,32 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-
-interface NavItem {
-  href: string
-  label: string
-  caption: string
-  match: string[]
-  icon: React.ReactNode
-}
+import { useStore } from '@/lib/store'
+import { canManageWorkspace, canViewBilling } from '@/lib/permissions'
+import { buildTenantPath, stripTenantPrefix } from '@/lib/tenant-routing'
+import { NAV_ROUTES, NAV_SECTIONS } from '@/lib/nav-config'
 
 const icon = (children: React.ReactNode) => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
     {children}
   </svg>
 )
 
-const SECTIONS: { title: string; items: NavItem[] }[] = [
-  {
-    title: 'Operate',
-    items: [
-      {
-        href: '/dashboard',
-        label: 'Overview',
-        caption: 'Platform health and lifecycle',
-        match: ['/dashboard'],
-        icon: icon(<><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /></>),
-      },
-      {
-        href: '/apis',
-        label: 'API Catalog',
-        caption: 'Publish, version, configure',
-        match: ['/apis'],
-        icon: icon(<><polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" /></>),
-      },
-      {
-        href: '/analytics',
-        label: 'Analytics',
-        caption: 'Traffic, errors, latency',
-        match: ['/analytics', '/logs'],
-        icon: icon(<><path d="M3 3v18h18" /><path d="M7 14l4-4 3 3 5-7" /></>),
-      },
-    ],
-  },
-  {
-    title: 'Engage',
-    items: [
-      {
-        href: '/portal',
-        label: 'Developer Portal',
-        caption: 'Docs, keys, plans, apps',
-        match: ['/portal'],
-        icon: icon(<><path d="M4 5h16v14H4z" /><path d="M8 9h8" /><path d="M8 13h5" /></>),
-      },
-      {
-        href: '/consumers',
-        label: 'Consumers',
-        caption: 'Applications and access',
-        match: ['/consumers'],
-        icon: icon(<><circle cx="8" cy="8" r="3" /><path d="M3 21c0-2.8 2.2-5 5-5s5 2.2 5 5" /><path d="M16 8h5" /><path d="M16 12h5" /><path d="M16 16h5" /></>),
-      },
-    ],
-  },
-  {
-    title: 'Control',
-    items: [
-      {
-        href: '/governance',
-        label: 'Governance',
-        caption: 'Policies, compliance, controls',
-        match: ['/governance'],
-        icon: icon(<><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></>),
-      },
-      {
-        href: '/settings',
-        label: 'Workspace',
-        caption: 'Roles, environments, billing',
-        match: ['/settings'],
-        icon: icon(<><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" /></>),
-      },
-    ],
-  },
-]
+const ICONS: Record<string, React.ReactNode> = {
+  '/dashboard': icon(<><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /></>),
+  '/apis': icon(<><polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" /></>),
+  '/analytics': icon(<><path d="M3 3v18h18" /><path d="M7 14l4-4 3 3 5-7" /></>),
+  '/monitoring': icon(<><circle cx="12" cy="12" r="10" /><path d="M12 8v4l2 2" /></>),
+  '/portal': icon(<><path d="M4 5h16v14H4z" rx="1" /><path d="M8 9h8" /><path d="M8 13h5" /></>),
+  '/consumers': icon(<><circle cx="8" cy="8" r="3" /><path d="M3 21c0-2.8 2.2-5 5-5s5 2.2 5 5" /><path d="M16 8h5" /><path d="M16 12h5" /><path d="M16 16h5" /></>),
+  '/governance': icon(<><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></>),
+  '/settings': icon(<><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" /></>),
+}
 
 export default function Sidebar() {
   const pathname = usePathname()
+  const { currentTenant, currentUser } = useStore()
+  const normalizedPath = stripTenantPrefix(pathname)
 
   return (
     <aside
@@ -93,79 +35,131 @@ export default function Sidebar() {
         position: 'sticky',
         top: 0,
         height: '100vh',
-        borderRight: '1px solid var(--c-border)',
-        background: '#171513',
-        color: '#f6f1eb',
+        width: 260,
+        borderRight: '1px solid rgba(255,255,255,0.10)',
+        background: 'linear-gradient(180deg, #0F2640 0%, #1A3D6B 100%)',
+        color: '#f0f2f8',
         display: 'flex',
         flexDirection: 'column',
+        boxShadow: '2px 0 24px rgba(0,0,0,0.20)',
+        userSelect: 'none',
       }}
     >
-      <div style={{ padding: '16px 16px 14px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+      {/* Logo area */}
+      <div style={{ padding: '18px 18px 14px', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-          <div style={{ width: 24, height: 24, background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 13 }}>
-            X
+          <div style={{
+            width: 30, height: 30,
+            background: 'linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%)',
+            borderRadius: 7,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: '#fff', fontWeight: 800, fontSize: 13,
+            boxShadow: '0 2px 8px rgba(26,95,180,0.20)',
+            fontFamily: 'var(--f-display)',
+          }}>
+            M
           </div>
           <div>
-            <div style={{ fontSize: 16, fontWeight: 700 }}>XPAT</div>
-            <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'rgba(255,255,255,0.48)' }}>
-              Enterprise Platform
+            <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: '-0.02em', fontFamily: 'var(--f-display)' }}>MindAPI</div>
+            <div style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.40)', marginTop: 1 }}>
+              {currentTenant.slug}.mindapi.io
             </div>
           </div>
         </div>
+
+        <div style={{
+          display: 'inline-flex', alignItems: 'center', gap: 5,
+          padding: '3px 9px', borderRadius: 20,
+          background: 'rgba(255,255,255,0.05)',
+        }}>
+          <span style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--success)', flexShrink: 0 }} />
+          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)', fontWeight: 500 }}>{currentUser.role}</span>
+        </div>
       </div>
 
-      <div style={{ flex: 1, overflowY: 'auto', padding: '12px 10px 14px' }}>
-        {SECTIONS.map((section) => (
-          <div key={section.title} style={{ marginBottom: 12 }}>
-            <div style={{ padding: '6px 8px', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.4)' }}>
-              {section.title}
-            </div>
-            <div style={{ display: 'grid', gap: 4 }}>
-              {section.items.map((item) => {
-                const active = item.match.some((path) => pathname === path || pathname.startsWith(path + '/'))
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    style={{
-                      display: 'grid',
-                      gridTemplateColumns: '18px minmax(0, 1fr)',
-                      gap: 10,
-                      alignItems: 'start',
-                      padding: '9px 8px',
-                      background: active ? 'rgba(210, 71, 31, 0.16)' : 'transparent',
-                      borderLeft: active ? '2px solid var(--accent)' : '2px solid transparent',
-                      color: active ? '#fff' : 'rgba(255,255,255,0.8)',
-                    }}
-                  >
-                    <span style={{ marginTop: 1, color: active ? '#fff' : 'rgba(255,255,255,0.55)' }}>{item.icon}</span>
-                    <span style={{ minWidth: 0 }}>
-                      <div style={{ fontSize: 14, fontWeight: 600 }}>{item.label}</div>
-                      <div style={{ fontSize: 11.5, color: active ? 'rgba(255,255,255,0.78)' : 'rgba(255,255,255,0.42)', marginTop: 2 }}>
-                        {item.caption}
+      {/* Navigation */}
+      <div style={{ flex: 1, overflowY: 'auto', padding: '10px 8px 12px' }}>
+        {NAV_SECTIONS.map((section) => {
+          const items = NAV_ROUTES.filter((route) => {
+            if (route.section !== section) return false
+            if (route.requiresManageWorkspace) return canManageWorkspace(currentUser.role)
+            if (route.requiresBilling) return canViewBilling(currentUser.role)
+            return true
+          })
+          if (!items.length) return null
+          return (
+            <div key={section} style={{ marginBottom: 14 }}>
+              <div style={{
+                padding: '4px 8px 6px',
+                fontSize: 10,
+                fontWeight: 600,
+                textTransform: 'uppercase',
+                letterSpacing: '0.14em',
+                color: 'rgba(255,255,255,0.35)',
+              }}>
+                {section}
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                {items.map((route) => {
+                  const match = route.sidebarMatch ?? [route.href]
+                  const active = match.some((p) => normalizedPath === p || normalizedPath.startsWith(p + '/'))
+                  return (
+                    <Link
+                      key={route.href}
+                      href={buildTenantPath(currentTenant.slug, route.href)}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 10,
+                        padding: '8px 10px',
+                        borderRadius: 6,
+                        background: active ? 'rgba(221, 238, 255, 0.12)' : 'transparent',
+                        color: active ? '#fff' : 'rgba(255,255,255,0.55)',
+                        transition: 'all var(--t-fast)',
+                        textDecoration: 'none',
+                        fontWeight: active ? 600 : 450,
+                        fontSize: 14,
+                        letterSpacing: '-0.01em',
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!active) (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)'
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!active) (e.currentTarget as HTMLElement).style.background = 'transparent'
+                      }}
+                    >
+                      <span style={{
+                        flexShrink: 0,
+                        color: active ? '#DDEEFF' : 'rgba(255,255,255,0.40)',
+                        transition: 'color var(--t-fast)',
+                        display: 'flex',
+                      }}>
+                        {ICONS[route.href]}
+                      </span>
+                      <div style={{ minWidth: 0, flex: 1 }}>
+                        <div>{route.label}</div>
+                        <div style={{
+                          fontSize: 11,
+                          color: active ? 'rgba(255,255,255,0.50)' : 'rgba(255,255,255,0.30)',
+                          marginTop: 1,
+                          fontWeight: 400,
+                        }}>
+                          {route.caption}
+                        </div>
                       </div>
-                    </span>
-                  </Link>
-                )
-              })}
+                    </Link>
+                  )
+                })}
+              </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
 
-      <div style={{ padding: 12, borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-        <div
-          style={{
-            fontSize: 14,
-            fontWeight: 800,
-            color: 'var(--accent)',
-            textAlign: 'center',
-            textTransform: 'uppercase',
-            letterSpacing: '0.24em',
-            textShadow: '0 0 18px rgba(210, 71, 31, 0.18)',
-          }}
-        >
-          Xpat
+      {/* Footer */}
+      <div style={{ padding: '10px 18px 14px', borderTop: '1px solid rgba(255,255,255,0.07)' }}>
+        <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', textAlign: 'center', letterSpacing: '0.12em', textTransform: 'uppercase', fontWeight: 600 }}>
+          MindAPI Platform
         </div>
       </div>
     </aside>

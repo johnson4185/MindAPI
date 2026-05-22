@@ -2,14 +2,43 @@
 
 import PageHeader from '@/components/ui/PageHeader'
 import Card from '@/components/ui/Card'
-import Badge from '@/components/ui/Badge'
+import { DataTable, Column } from '@/components/ui/DataTable'
+import { Metric } from '@/components/ui/Metric'
+import { StatusBadge } from '@/components/ui/StatusBadge'
 import { useStore } from '@/lib/store'
+import { PageLayout } from '@/components/shared/PageLayout'
+
+type PluginRow = {
+  name: string
+  desc: string
+  category: string
+  scope: string
+  source: string
+  enabled: boolean
+}
+
+const COLUMNS: Column<PluginRow>[] = [
+  { key: 'name', label: 'Name', render: (_, p) => <><div style={{ fontWeight: 700, marginBottom: 4 }}>{p.name}</div><div style={{ fontSize: 12.5, color: 'var(--c-ink-4)' }}>{p.desc}</div></> },
+  { key: 'category', label: 'Category', render: (v) => <StatusBadge variant={(v as string) === 'Authentication' ? 'info' : (v as string) === 'Traffic Control' ? 'warning' : 'neutral'}>{v as string}</StatusBadge> },
+  { key: 'scope', label: 'Scope' },
+  { key: 'source', label: 'Source' },
+  { key: 'enabled', label: 'Default state', render: (v) => <StatusBadge variant={v ? 'success' : 'neutral'}>{v ? 'Enabled' : 'Disabled'}</StatusBadge> },
+]
 
 export default function PluginsPage() {
   const { pluginTemplates, apis } = useStore()
+  const enabled = pluginTemplates.filter((p) => p.enabled).length
+  const rows: PluginRow[] = pluginTemplates.map((p) => ({
+    name: p.name,
+    desc: p.desc,
+    category: p.category || 'Custom',
+    scope: p.scope || 'service',
+    source: p.source || 'bundled',
+    enabled: p.enabled,
+  }))
 
   return (
-    <div className="page-enter" style={{ padding: 24 }}>
+    <PageLayout>
       <PageHeader
         eyebrow="Policies"
         title="Policy Library"
@@ -18,45 +47,12 @@ export default function PluginsPage() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 14, marginBottom: 18 }}>
         <Metric label="Templates" value={String(pluginTemplates.length)} />
         <Metric label="Managed APIs" value={String(apis.length)} />
-        <Metric label="Enabled by default" value={String(pluginTemplates.filter((plugin) => plugin.enabled).length)} />
+        <Metric label="Enabled by default" value={String(enabled)} />
       </div>
 
       <Card title="Policy templates">
-        <table>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Category</th>
-              <th>Scope</th>
-              <th>Source</th>
-              <th>Default state</th>
-            </tr>
-          </thead>
-          <tbody>
-            {pluginTemplates.map((plugin) => (
-              <tr key={plugin.name}>
-                <td>
-                  <div style={{ fontWeight: 700, marginBottom: 4 }}>{plugin.name}</div>
-                  <div style={{ fontSize: 12.5, color: 'var(--c-ink-4)' }}>{plugin.desc}</div>
-                </td>
-                <td><Badge variant={plugin.category === 'Authentication' ? 'blue' : plugin.category === 'Traffic Control' ? 'amber' : 'gray'}>{plugin.category || 'Custom'}</Badge></td>
-                <td>{plugin.scope || 'service'}</td>
-                <td>{plugin.source || 'bundled'}</td>
-                <td><Badge variant={plugin.enabled ? 'green' : 'gray'}>{plugin.enabled ? 'Enabled' : 'Disabled'}</Badge></td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <DataTable columns={COLUMNS} data={rows} />
       </Card>
-    </div>
-  )
-}
-
-function Metric({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="surface-card" style={{ padding: 18 }}>
-      <div className="eyebrow" style={{ color: 'var(--c-ink-4)', marginBottom: 10 }}>{label}</div>
-      <div className="metric-value" style={{ fontSize: 26, fontWeight: 700 }}>{value}</div>
-    </div>
+    </PageLayout>
   )
 }

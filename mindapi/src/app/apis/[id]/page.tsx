@@ -8,13 +8,14 @@ import Card from '@/components/ui/Card'
 import Badge from '@/components/ui/Badge'
 import { useStore } from '@/lib/store'
 import { HttpMethod } from '@/lib/types'
+import { buildTenantPath } from '@/lib/tenant-routing'
 
 const TEST_METHODS: HttpMethod[] = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
 
 export default function APIDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const router = useRouter()
-  const { apis } = useStore()
+  const { apis, currentTenant } = useStore()
   const api = apis.find((item) => item.id === id) ?? apis[0]
   const [method, setMethod] = useState<HttpMethod>('GET')
   const [path, setPath] = useState('')
@@ -57,7 +58,7 @@ export default function APIDetailPage({ params }: { params: Promise<{ id: string
 
   return (
     <div className="page-enter" style={{ padding: 24 }}>
-      <Breadcrumb items={[{ label: 'API Catalog', href: '/apis' }, { label: api.name }]} />
+      <Breadcrumb items={[{ label: 'API Catalog', href: buildTenantPath(currentTenant.slug, '/apis') }, { label: api.name }]} />
 
       <div style={{ display: 'flex', justifyContent: 'space-between', gap: 18, alignItems: 'flex-start', flexWrap: 'wrap', marginBottom: 20 }}>
         <div style={{ maxWidth: 860 }}>
@@ -71,8 +72,8 @@ export default function APIDetailPage({ params }: { params: Promise<{ id: string
           </div>
         </div>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          <Button variant="default" size="lg" onClick={() => router.push('/apis')}>Back to catalog</Button>
-          <Button variant="primary" size="lg" onClick={() => router.push('/analytics')}>View runtime analytics</Button>
+          <Button variant="default" size="lg" onClick={() => router.push(buildTenantPath(currentTenant.slug, '/apis'))}>Back to catalog</Button>
+          <Button variant="primary" size="lg" onClick={() => router.push(buildTenantPath(currentTenant.slug, '/analytics'))}>View runtime analytics</Button>
         </div>
       </div>
 

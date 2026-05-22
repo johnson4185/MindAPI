@@ -1,7 +1,11 @@
 'use client'
 import { createContext, useContext, useState, useCallback, ReactNode, useEffect } from 'react'
-import { API, Consumer } from './types'
+import { API, Consumer, PlatformUser, TenantWorkspace, UserRole } from './types'
 import { fetchJson } from './api-client'
+
+function clonePlugin(plugin: PluginConfig): PluginConfig {
+  return { ...plugin, config: { ...plugin.config } }
+}
 
 type ToastType = 'success' | 'error' | 'info'
 
@@ -103,6 +107,12 @@ interface StoreCtx {
   commandPaletteOpen: boolean
   loadingApis: boolean
   loadingConsumers: boolean
+  currentTenant: TenantWorkspace
+  tenants: TenantWorkspace[]
+  currentUser: PlatformUser
+  setCurrentRole: (role: UserRole) => void
+  setCurrentTenant: (tenantId: string) => void
+  setCurrentTenantBySlug: (slug: string) => void
   openCommandPalette: () => void
   closeCommandPalette: () => void
   showToast: (message: string, type?: ToastType) => void
@@ -120,16 +130,32 @@ interface StoreCtx {
 
 const Store = createContext<StoreCtx | null>(null)
 
+const DEFAULT_TENANTS: TenantWorkspace[] = [
+  { id: 'tenant-acme', slug: 'acme', name: 'Acme Corp', plan: 'Growth' },
+  { id: 'tenant-orbit', slug: 'orbit', name: 'Orbit Finance', plan: 'Enterprise' },
+  { id: 'tenant-sample', slug: 'sample', name: 'Sample Workspace', plan: 'Starter' },
+]
+
+const DEFAULT_USER: PlatformUser = {
+  id: 'usr-ava',
+  name: 'Ava Kim',
+  email: 'ava.kim@mindapi.dev',
+  role: 'Owner',
+}
+
 export function StoreProvider({ children }: { children: ReactNode }) {
   const [toast, setToast] = useState<Toast>({ message: '', type: 'success', visible: false })
   const [apis, setApis] = useState<API[]>([])
   const [consumers, setConsumers] = useState<Consumer[]>([])
-  const [pluginTemplates] = useState<PluginConfig[]>(DEFAULT_PLUGIN_SET.map((plugin) => ({ ...plugin, config: { ...plugin.config } })))
+  const [pluginTemplates] = useState<PluginConfig[]>(DEFAULT_PLUGIN_SET.map(clonePlugin))
   const [apiPlugins, setApiPlugins] = useState<Record<string, PluginConfig[]>>({})
   const [notifications, setNotifications] = useState<AppNotification[]>(INITIAL_NOTIFICATIONS)
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false)
   const [loadingApis, setLoadingApis] = useState(true)
   const [loadingConsumers, setLoadingConsumers] = useState(true)
+  const [tenants] = useState<TenantWorkspace[]>(DEFAULT_TENANTS)
+  const [currentTenantId, setCurrentTenantId] = useState(DEFAULT_TENANTS[0].id)
+  const [currentUser, setCurrentUser] = useState<PlatformUser>(DEFAULT_USER)
 
   const openCommandPalette = useCallback(() => setCommandPaletteOpen(true), [])
   const closeCommandPalette = useCallback(() => setCommandPaletteOpen(false), [])
@@ -139,6 +165,23 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setTimeout(() => setToast((current) => ({ ...current, visible: false })), 3000)
   }, [])
 
+  const setCurrentRole = useCallback((role: UserRole) => {
+    setCurrentUser((prev) => ({ ...prev, role }))
+    showToast(`Role switched to ${role}`, 'info')
+  }, [showToast])
+
+  const setCurrentTenant = useCallback((tenantId: string) => {
+    setCurrentTenantId(tenantId)
+    const tenant = tenants.find((entry) => entry.id === tenantId)
+    if (tenant) showToast(`Workspace switched to ${tenant.name}`, 'info')
+  }, [showToast, tenants])
+
+  const setCurrentTenantBySlug = useCallback((slug: string) => {
+    const tenant = tenants.find((entry) => entry.slug === slug)
+    if (!tenant || tenant.id === currentTenantId) return
+    setCurrentTenantId(tenant.id)
+  }, [currentTenantId, tenants])
+
   const refreshApis = useCallback(async () => {
     setLoadingApis(true)
     try {
@@ -147,24 +190,28 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       setApiPlugins((prev) => {
         const next = { ...prev }
         for (const api of data) {
-          if (!next[api.id]) next[api.id] = pluginTemplates.map((plugin) => ({ ...plugin, config: { ...plugin.config } }))
+          if (!next[api.id]) next[api.id] = pluginTemplates.map(clonePlugin)
         }
         return next
       })
+    } catch {
+      showToast('Could not load APIs from mock API', 'error')
     } finally {
       setLoadingApis(false)
     }
-  }, [pluginTemplates])
+  }, [pluginTemplates, showToast])
 
   const refreshConsumers = useCallback(async () => {
     setLoadingConsumers(true)
     try {
       const data = await fetchJson<Consumer[]>('/api/mock/consumers')
       setConsumers(data)
+    } catch {
+      showToast('Could not load consumers from mock API', 'error')
     } finally {
       setLoadingConsumers(false)
     }
-  }, [])
+  }, [showToast])
 
   useEffect(() => {
     void refreshApis()
@@ -189,7 +236,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     await fetchJson<API>('/api/mock/apis', { method: 'POST', body: JSON.stringify(api) })
     setApiPlugins((prev) => ({
       ...prev,
-      [api.id]: (plugins || pluginTemplates).map((plugin) => ({ ...plugin, config: { ...plugin.config } })),
+      [api.id]: (plugins || pluginTemplates).map(clonePlugin),
     }))
     await refreshApis()
     pushNotification({
@@ -222,7 +269,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const updateApiPlugins = useCallback((apiId: string, plugins: PluginConfig[]) => {
     setApiPlugins((prev) => ({
       ...prev,
-      [apiId]: plugins.map((plugin) => ({ ...plugin, config: { ...plugin.config } })),
+      [apiId]: plugins.map(clonePlugin),
     }))
   }, [])
 
@@ -246,6 +293,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         commandPaletteOpen,
         loadingApis,
         loadingConsumers,
+        currentTenant: tenants.find((tenant) => tenant.id === currentTenantId) || tenants[0],
+        tenants,
+        currentUser,
+        setCurrentRole,
+        setCurrentTenant,
+        setCurrentTenantBySlug,
         openCommandPalette,
         closeCommandPalette,
         showToast,

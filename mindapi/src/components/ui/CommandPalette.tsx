@@ -2,6 +2,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useStore } from '@/lib/store'
+import { buildTenantPath } from '@/lib/tenant-routing'
+import { NAV_ROUTES } from '@/lib/nav-config'
 
 type ItemType = 'page' | 'action' | 'api' | 'consumer'
 
@@ -15,13 +17,15 @@ interface PaletteItem {
 }
 
 const NAV_ITEMS: PaletteItem[] = [
-  { id: 'nav-dashboard', type: 'page', label: 'Dashboard', description: 'Platform overview and KPIs', href: '/dashboard', keywords: 'overview metrics' },
-  { id: 'nav-apis', type: 'page', label: 'API Catalog', description: 'Browse and manage APIs', href: '/apis', keywords: 'catalog publish gateway' },
-  { id: 'nav-consumers', type: 'page', label: 'Consumers', description: 'Applications, keys, and subscriptions', href: '/consumers', keywords: 'apps subscriptions keys' },
-  { id: 'nav-analytics', type: 'page', label: 'Analytics', description: 'Traffic and performance metrics', href: '/analytics', keywords: 'charts latency errors' },
-  { id: 'nav-logs', type: 'page', label: 'Logs', description: 'Live request and error logs', href: '/logs', keywords: 'debug requests stream' },
-  { id: 'nav-portal', type: 'page', label: 'Developer Portal', description: 'Docs, plans, and onboarding', href: '/portal', keywords: 'docs plans portal' },
-  { id: 'nav-settings', type: 'page', label: 'Workspace', description: 'Roles, environments, billing', href: '/settings', keywords: 'settings rbac environments' },
+  ...NAV_ROUTES.map((route) => ({
+    id: `nav-${route.href.replace('/', '')}`,
+    type: 'page' as const,
+    label: route.label,
+    description: route.caption,
+    href: route.href,
+    keywords: route.keywords,
+  })),
+  { id: 'nav-logs', type: 'page', label: 'Logs', description: 'Live request and error logs', href: '/logs', keywords: 'debug requests stream logs' },
 ]
 
 const ACTION_ITEMS: PaletteItem[] = [
@@ -38,7 +42,7 @@ function typeColor(type: ItemType) {
 }
 
 export default function CommandPalette() {
-  const { commandPaletteOpen, closeCommandPalette, openCommandPalette, apis, consumers } = useStore()
+  const { commandPaletteOpen, closeCommandPalette, openCommandPalette, apis, consumers, currentTenant } = useStore()
   const [query, setQuery] = useState('')
   const [activeIdx, setActiveIdx] = useState(0)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -57,9 +61,12 @@ export default function CommandPalette() {
 
   useEffect(() => {
     if (!commandPaletteOpen) return
-    setQuery('')
-    setActiveIdx(0)
-    setTimeout(() => inputRef.current?.focus(), 0)
+    const timer = setTimeout(() => {
+      setQuery('')
+      setActiveIdx(0)
+      inputRef.current?.focus()
+    }, 0)
+    return () => clearTimeout(timer)
   }, [commandPaletteOpen])
 
   const allItems = useMemo<PaletteItem[]>(() => [
@@ -94,7 +101,7 @@ export default function CommandPalette() {
   }, [allItems, query])
 
   function navigate(href: string) {
-    router.push(href)
+    router.push(buildTenantPath(currentTenant.slug, href))
     closeCommandPalette()
   }
 

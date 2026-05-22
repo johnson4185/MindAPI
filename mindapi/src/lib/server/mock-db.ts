@@ -3,6 +3,7 @@ import 'server-only'
 import {
   MOCK_ANALYTICS,
   MOCK_APIS,
+  MOCK_BILLING,
   MOCK_CONSUMERS,
   MOCK_CONSUMER_KEYS,
   MOCK_DASHBOARD,
@@ -10,10 +11,15 @@ import {
   MOCK_PORTAL,
   MOCK_SUBSCRIPTIONS,
   MOCK_WORKSPACE,
+  MOCK_WEBHOOKS,
+  MOCK_WEBHOOK_DELIVERIES,
+  MOCK_ALERT_RULES,
+  MOCK_SERVICES,
 } from '@/lib/mock-data'
 import {
   API,
   AnalyticsSnapshot,
+  BillingSnapshot,
   Consumer,
   ConsumerKey,
   ConsumerSubscription,
@@ -21,6 +27,11 @@ import {
   LogEntry,
   PortalSnapshot,
   WorkspaceSnapshot,
+  WebhookEndpoint,
+  WebhookDelivery,
+  AlertRule,
+  ServiceHealth,
+  MonitoringSnapshot,
 } from '@/lib/types'
 
 type MockState = {
@@ -33,6 +44,11 @@ type MockState = {
   dashboard: DashboardSnapshot
   portal: PortalSnapshot
   workspace: WorkspaceSnapshot
+  billing: BillingSnapshot
+  webhooks: WebhookEndpoint[]
+  webhookDeliveries: WebhookDelivery[]
+  alertRules: AlertRule[]
+  services: ServiceHealth[]
 }
 
 declare global {
@@ -54,6 +70,11 @@ function seedState(): MockState {
     dashboard: clone(MOCK_DASHBOARD),
     portal: clone(MOCK_PORTAL),
     workspace: clone(MOCK_WORKSPACE),
+    billing: clone(MOCK_BILLING),
+    webhooks: clone(MOCK_WEBHOOKS),
+    webhookDeliveries: clone(MOCK_WEBHOOK_DELIVERIES),
+    alertRules: clone(MOCK_ALERT_RULES),
+    services: clone(MOCK_SERVICES),
   }
 }
 
@@ -180,9 +201,47 @@ export function getPortalSnapshot() {
 }
 
 export function getWorkspaceSnapshot() {
-  return getState().workspace
+  const state = getState()
+  return {
+    ...state.workspace,
+    currentPlan: state.billing.currentPlan,
+    monthlySpend: state.billing.monthlySpend,
+    projectedOverage: state.billing.projectedOverage,
+    usage: state.billing.usage,
+    invoices: state.billing.invoices,
+  }
+}
+
+export function getBillingSnapshot() {
+  return getState().billing
 }
 
 export function listLogs() {
   return getState().logs
+}
+
+export function listWebhooks() {
+  return getState().webhooks
+}
+
+export function listWebhookDeliveries() {
+  return getState().webhookDeliveries
+}
+
+export function listAlertRules() {
+  return getState().alertRules
+}
+
+export function getMonitoringSnapshot(): MonitoringSnapshot {
+  const state = getState()
+  const services = state.services
+  return {
+    services,
+    summary: {
+      total: services.length,
+      healthy: services.filter((s) => s.status === 'Healthy').length,
+      degraded: services.filter((s) => s.status === 'Degraded' || s.status === 'Maintenance').length,
+      down: services.filter((s) => s.status === 'Down').length,
+    },
+  }
 }

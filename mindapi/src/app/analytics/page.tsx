@@ -1,12 +1,14 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import PageHeader from '@/components/ui/PageHeader'
 import Card from '@/components/ui/Card'
 import Badge from '@/components/ui/Badge'
 import Button from '@/components/ui/Button'
 import { AnalyticsSnapshot } from '@/lib/types'
-import { fetchJson } from '@/lib/api-client'
+import { PageLayout } from '@/components/shared/PageLayout'
+import { AnalyticsPageSkeleton } from '@/components/ui/Skeleton'
+import { Metric } from '@/components/ui/Metric'
+import { useApiData } from '@/hooks/useApiData'
 
 const EMPTY: AnalyticsSnapshot = {
   totals: { requests: '0', errorRate: '0%', avgLatency: '0ms', activeConsumers: 0 },
@@ -16,25 +18,37 @@ const EMPTY: AnalyticsSnapshot = {
 }
 
 export default function AnalyticsPage() {
-  const [snapshot, setSnapshot] = useState<AnalyticsSnapshot>(EMPTY)
+  const { data: snapshot, loading, error } = useApiData<AnalyticsSnapshot>(
+    '/api/mock/analytics',
+    {
+      onError: (err) => console.error('Failed to load analytics:', err),
+    }
+  )
 
-  useEffect(() => {
-    void fetchJson<AnalyticsSnapshot>('/api/mock/analytics').then(setSnapshot)
-  }, [])
+  const displayData = snapshot || EMPTY
+
+  if (loading) {
+    return (
+      <PageLayout>
+        <AnalyticsPageSkeleton />
+      </PageLayout>
+    )
+  }
 
   return (
-    <div className="page-enter" style={{ padding: 24 }}>
+    <PageLayout>
       <PageHeader
         eyebrow="Analytics"
         title="Traffic Intelligence"
         actions={<><Button variant="default" size="lg">Export report</Button><Button variant="primary" size="lg">Create alert</Button></>}
       />
+      {!!error && <div className="surface-card" style={{ padding: 16, marginBottom: 14, borderColor: 'var(--danger-bd)', background: 'var(--danger-bg)', color: 'var(--danger)' }}>{error.message}</div>}
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 14, marginBottom: 18 }}>
-        <Stat label="Requests / day" value={snapshot.totals.requests} />
-        <Stat label="Error rate" value={snapshot.totals.errorRate} />
-        <Stat label="Average latency" value={snapshot.totals.avgLatency} />
-        <Stat label="Active consumers" value={String(snapshot.totals.activeConsumers)} />
+        <Metric label="Requests / day" value={displayData.totals.requests} />
+        <Metric label="Error rate" value={displayData.totals.errorRate} />
+        <Metric label="Average latency" value={displayData.totals.avgLatency} />
+        <Metric label="Active consumers" value={String(displayData.totals.activeConsumers)} />
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1.3fr 1fr', gap: 18, marginBottom: 18 }}>
@@ -50,7 +64,9 @@ export default function AnalyticsPage() {
               </tr>
             </thead>
             <tbody>
-              {snapshot.apiPerformance.map((row) => (
+              {!displayData.apiPerformance.length ? (
+                <tr><td colSpan={5} style={{ color: 'var(--c-ink-4)' }}>No performance rows available.</td></tr>
+              ) : displayData.apiPerformance.map((row) => (
                 <tr key={row.api}>
                   <td>{row.api}</td>
                   <td>{row.requests}</td>
@@ -65,7 +81,7 @@ export default function AnalyticsPage() {
 
         <Card title="Consumer segments">
           <div style={{ display: 'grid', gap: 0 }}>
-            {snapshot.consumerSegments.map((segment, index) => (
+            {displayData.consumerSegments.map((segment, index) => (
               <div key={segment.segment} style={{ padding: '16px 18px', borderTop: index === 0 ? 'none' : '1px solid var(--c-border)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10, marginBottom: 6 }}>
                   <div style={{ fontSize: 14, fontWeight: 700 }}>{segment.segment}</div>
@@ -80,7 +96,7 @@ export default function AnalyticsPage() {
 
       <Card title="Hourly traffic">
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, minmax(0, 1fr))', gap: 10, padding: 18 }}>
-          {snapshot.hourlyTraffic.map((point) => (
+          {displayData.hourlyTraffic.map((point) => (
             <div key={point.hour} style={{ border: '1px solid var(--c-border)', background: 'var(--c-panel-soft)', padding: 12 }}>
               <div style={{ fontSize: 12, color: 'var(--c-ink-4)', marginBottom: 8 }}>{point.hour}</div>
               <div className="metric-value" style={{ fontSize: 18, fontWeight: 700 }}>{point.requests}</div>
@@ -88,15 +104,6 @@ export default function AnalyticsPage() {
           ))}
         </div>
       </Card>
-    </div>
-  )
-}
-
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="surface-card" style={{ padding: 18 }}>
-      <div className="eyebrow" style={{ color: 'var(--c-ink-4)', marginBottom: 10 }}>{label}</div>
-      <div className="metric-value" style={{ fontSize: 26, fontWeight: 700 }}>{value}</div>
-    </div>
+    </PageLayout>
   )
 }

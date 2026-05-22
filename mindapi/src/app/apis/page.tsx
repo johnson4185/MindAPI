@@ -4,173 +4,150 @@ import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import PageHeader from '@/components/ui/PageHeader'
 import Button from '@/components/ui/Button'
-import Badge from '@/components/ui/Badge'
 import Modal from '@/components/ui/Modal'
+import { DataTable, Column } from '@/components/ui/DataTable'
+import { Metric } from '@/components/ui/Metric'
+import { StatusBadge } from '@/components/ui/StatusBadge'
 import { useDebounce } from '@/lib/hooks/useDebounce'
 import { useStore } from '@/lib/store'
+import { canManageApis } from '@/lib/permissions'
+import { buildTenantPath } from '@/lib/tenant-routing'
+import { PageLayout } from '@/components/shared/PageLayout'
+import { API } from '@/lib/types'
 
-const endpointCount = (basePath: string) => (basePath.length % 5) + 5
+type APIRow = API & {
+  endpoints: number
+  plan: string
+  portal: string
+}
+
+function endpointCount(id: string) {
+  let hash = 0
+  for (let i = 0; i < id.length; i++) hash = (hash * 31 + id.charCodeAt(i)) & 0xffff
+  return (hash % 12) + 4
+}
 
 export default function APIsPage() {
   const router = useRouter()
-  const { apis, removeApi, showToast, loadingApis } = useStore()
+  const { apis, removeApi, showToast, loadingApis, currentUser, currentTenant } = useStore()
   const [search, setSearch] = useState('')
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null)
+  const [envFilter, setEnvFilter] = useState('All environments')
+  const [statusFilter, setStatusFilter] = useState('All statuses')
   const debouncedSearch = useDebounce(search, 150)
 
   const filtered = useMemo(() => {
-    return apis.filter((api) =>
-      [api.name, api.basePath, api.owner, api.environment, api.status].some((value) =>
-        value.toLowerCase().includes(debouncedSearch.toLowerCase()),
-      ),
-    )
-  }, [apis, debouncedSearch])
+    return apis.filter((api) => {
+      const matchSearch = [api.name, api.basePath, api.owner, api.environment, api.status].some((v) =>
+        v.toLowerCase().includes(debouncedSearch.toLowerCase()),
+      )
+      const matchEnv = envFilter === 'All environments' || api.environment === envFilter
+      const matchStatus = statusFilter === 'All statuses' || api.status === statusFilter
+      return matchSearch && matchEnv && matchStatus
+    })
+  }, [apis, debouncedSearch, envFilter, statusFilter])
 
   const published = apis.filter((api) => api.status === 'Active').length
   const drafts = apis.filter((api) => api.status === 'Draft').length
 
+  const rows: APIRow[] = filtered.map((api) => ({
+    ...api,
+    endpoints: endpointCount(api.id),
+    plan: api.environment === 'Production' ? 'Pro / Enterprise' : api.status === 'Draft' ? 'Unassigned' : 'Sandbox',
+    portal: api.status === 'Active' ? 'Published docs' : 'Internal draft',
+  }))
+
+  const COLUMNS: Column<APIRow>[] = [
+    { key: 'name', label: 'API', render: (_, api) => (
+      <div>
+        <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--c-ink)', marginBottom: 4 }}>{api.name}</div>
+        <div style={{ fontSize: 12.5, color: 'var(--c-ink-4)', fontFamily: 'var(--f-mono)' }}>{api.basePath}</div>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 8 }}>
+          <StatusBadge variant={api.status === 'Active' ? 'success' : api.status === 'Draft' ? 'info' : 'warning'} size="sm">{api.status}</StatusBadge>
+          <StatusBadge variant={api.security.length ? 'info' : 'warning'} size="sm">{api.security.join(' / ') || 'Auth missing'}</StatusBadge>
+        </div>
+      </div>
+    ) },
+    { key: 'version', label: 'Version', render: (v) => <span style={{ fontFamily: 'var(--f-mono)', color: 'var(--c-ink-3)' }}>{v as string}</span> },
+    { key: 'endpoints', label: 'Endpoints', render: (v) => <><div style={{ fontSize: 14, fontWeight: 700 }}>{v}</div><div style={{ fontSize: 12, color: 'var(--c-ink-4)' }}>Endpoint configs</div></> },
+    { key: 'environment', label: 'Gateway', render: (v) => <><div style={{ fontSize: 13.5, fontWeight: 600 }}>{v as string}</div><div style={{ fontSize: 12, color: 'var(--c-ink-4)' }}>Route, auth, quotas</div></> },
+    { key: 'portal', label: 'Portal', render: (v) => <><div style={{ fontSize: 13.5, fontWeight: 600 }}>{v as string}</div><div style={{ fontSize: 12, color: 'var(--c-ink-4)' }}>Try API enabled</div></> },
+    { key: 'plan', label: 'Plans', render: (v) => <><div style={{ fontSize: 13.5, fontWeight: 600 }}>{v as string}</div><div style={{ fontSize: 12, color: 'var(--c-ink-4)' }}>Usage quotas mapped</div></> },
+    { key: 'owner', label: 'Owner', render: (v) => <><div style={{ fontSize: 13.5, fontWeight: 600 }}>{v as string}</div><div style={{ fontSize: 12, color: 'var(--c-ink-4)' }}>Workspace role owner</div></> },
+    { key: 'updatedAt', label: 'Updated' },
+    { key: 'id', label: 'Actions', render: (_, api) => (
+      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+        <Button variant="ghost" size="sm" onClick={() => router.push(buildTenantPath(currentTenant.slug, `/apis/${api.id}`))}>Open</Button>
+        <Button variant="danger" size="sm" onClick={() => setDeleteTarget(api.id)} disabled={!canManageApis(currentUser.role)}>Delete</Button>
+      </div>
+    )},
+  ]
+
   async function handleDelete() {
-    if (!deleteTarget) return
+    if (!deleteTarget || !canManageApis(currentUser.role)) return
     await removeApi(deleteTarget)
     setDeleteTarget(null)
     showToast('API removed from the catalog', 'success')
   }
 
+  if (loadingApis && apis.length === 0) {
+    return (
+      <PageLayout>
+        <div className="surface-card" style={{ padding: 48, textAlign: 'center' }}>
+          <div className="skeleton-block" style={{ width: 120, height: 14, margin: '0 auto 16px' }} />
+          <div className="skeleton-block" style={{ width: 280, height: 28, margin: '0 auto 24px' }} />
+          <div className="skeleton-block" style={{ width: '100%', height: 12, margin: '0 auto 8px' }} />
+          <div className="skeleton-block" style={{ width: '85%', height: 12, margin: '0 auto' }} />
+        </div>
+      </PageLayout>
+    )
+  }
+
   return (
-    <div className="page-enter" style={{ padding: 24 }}>
+    <PageLayout>
       <PageHeader
         eyebrow="API Publishing"
         title="API Portfolio"
         actions={
           <>
-            <Button variant="default" size="lg" onClick={() => router.push('/apis/publish?source=import')}>Import OpenAPI</Button>
-            <Button variant="primary" size="lg" onClick={() => router.push('/apis/publish')}>Create API</Button>
+            <Button variant="default" size="lg" onClick={() => router.push(buildTenantPath(currentTenant.slug, '/apis/publish?source=import'))}>Import OpenAPI</Button>
+            <Button variant="primary" size="lg" onClick={() => router.push(buildTenantPath(currentTenant.slug, '/apis/publish'))} disabled={!canManageApis(currentUser.role)}>Create API</Button>
           </>
         }
       />
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1.3fr repeat(3, minmax(0, 1fr))', gap: 14, marginBottom: 18 }}>
-        <section className="surface-card" style={{ padding: 18 }}>
-          <div className="eyebrow" style={{ color: 'var(--accent)', marginBottom: 10 }}>Catalog Structure</div>
-          <div style={{ fontSize: 22, fontWeight: 700, marginBottom: 8 }}>Every API carries lifecycle, security, and portal metadata.</div>
-          <p style={{ fontSize: 13.5, lineHeight: 1.7 }}>
-            Review versions, endpoint coverage, monetization readiness, and developer-facing availability directly in the list view.
-          </p>
-        </section>
-        <MetricCard label="Published" value={String(published)} hint="Production-ready APIs" />
-        <MetricCard label="Drafts" value={String(drafts)} hint="Need docs, tests, or routing" />
-        <MetricCard label="Products" value="5" hint="Plans attached to this catalog" />
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 14, marginBottom: 18 }}>
+        <Metric label="Published" value={String(published)} subtext="Production-ready APIs" />
+        <Metric label="Drafts" value={String(drafts)} subtext="Need docs, tests, or routing" />
+        <Metric label="Products" value="5" subtext="Plans attached to this catalog" />
+        <Metric label="Total APIs" value={String(apis.length)} subtext="Across all environments" />
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(280px, 1fr) auto auto auto', gap: 8, alignItems: 'center', marginBottom: 14 }}>
-        <input
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-          placeholder="Search by API, owner, environment, or status"
-        />
-        <select defaultValue="All environments">
-          <option>All environments</option>
-          <option>Production</option>
-          <option>Staging</option>
-          <option>Development</option>
-        </select>
-        <select defaultValue="All access models">
-          <option>All access models</option>
-          <option>Public docs</option>
-          <option>Private product</option>
-          <option>Internal only</option>
-        </select>
-        <select defaultValue="All statuses">
-          <option>All statuses</option>
-          <option>Active</option>
-          <option>Draft</option>
-          <option>Deprecated</option>
-        </select>
-        <div style={{ gridColumn: '1 / -1', fontSize: 13, color: 'var(--c-ink-4)' }}>
-          {loadingApis ? 'Loading APIs…' : `${filtered.length} APIs in catalog`}
+      <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 14, flexWrap: 'wrap' }}>
+        <div style={{ position: 'relative', flex: '1 1 280px', minWidth: 200 }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--c-ink-4)" strokeWidth="2.2" strokeLinecap="round" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}>
+            <circle cx="11" cy="11" r="7" /><path d="m21 21-4.5-4.5" />
+          </svg>
+          <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search APIs..." style={{ paddingLeft: 34 }} />
         </div>
+        <select value={envFilter} onChange={(e) => setEnvFilter(e.target.value)} style={{ width: 'auto', minWidth: 150 }}>
+          <option>All environments</option>
+          <option>Production</option><option>Staging</option><option>Development</option>
+        </select>
+        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} style={{ width: 'auto', minWidth: 140 }}>
+          <option>All statuses</option>
+          <option>Active</option><option>Draft</option><option>Deprecated</option>
+        </select>
+        <span style={{ fontSize: 13, color: 'var(--c-ink-4)', marginLeft: 'auto' }}>
+          {loadingApis ? 'Loading…' : `${filtered.length} APIs in catalog`}
+        </span>
       </div>
 
-      <div className="surface-card" style={{ overflow: 'hidden', marginBottom: 18 }}>
-        <table>
-          <thead>
-            <tr>
-              <th>API</th>
-              <th>Version</th>
-              <th>Endpoints</th>
-              <th>Gateway</th>
-              <th>Portal</th>
-              <th>Plans</th>
-              <th>Owner</th>
-              <th>Updated</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.length === 0 ? (
-              <tr>
-                <td colSpan={9}>
-                  <div className="empty-state">
-                    <div className="empty-state-icon">
-                      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                        <polyline points="16 18 22 12 16 6" />
-                        <polyline points="8 6 2 12 8 18" />
-                      </svg>
-                    </div>
-                    <div className="empty-state-title">No APIs matched this view</div>
-                    <div className="empty-state-body">Try changing the filters, or create a new API product from an OpenAPI import.</div>
-                  </div>
-                </td>
-              </tr>
-            ) : filtered.map((api) => {
-              const endpoints = endpointCount(api.basePath)
-              const plan = api.environment === 'Production' ? 'Pro / Enterprise' : api.status === 'Draft' ? 'Unassigned' : 'Sandbox'
-              const portal = api.status === 'Active' ? 'Published docs' : 'Internal draft'
-              return (
-                <tr key={api.id}>
-                  <td onClick={() => router.push(`/apis/${api.id}`)} style={{ cursor: 'pointer' }}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--c-ink)', marginBottom: 4 }}>{api.name}</div>
-                    <div style={{ fontSize: 12.5, color: 'var(--c-ink-4)', fontFamily: 'var(--f-mono)' }}>{api.basePath}</div>
-                    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 8 }}>
-                      <Badge variant={api.status === 'Active' ? 'green' : api.status === 'Draft' ? 'blue' : 'amber'}>{api.status}</Badge>
-                      <Badge variant={api.security.length ? 'blue' : 'amber'}>{api.security.join(' / ') || 'Auth missing'}</Badge>
-                    </div>
-                  </td>
-                  <td style={{ fontFamily: 'var(--f-mono)', color: 'var(--c-ink-3)' }}>{api.version}</td>
-                  <td>
-                    <div style={{ fontSize: 14, fontWeight: 700 }}>{endpoints}</div>
-                    <div style={{ fontSize: 12, color: 'var(--c-ink-4)' }}>Endpoint configs</div>
-                  </td>
-                  <td>
-                    <div style={{ fontSize: 13.5, fontWeight: 600 }}>{api.environment}</div>
-                    <div style={{ fontSize: 12, color: 'var(--c-ink-4)' }}>Route, auth, quotas</div>
-                  </td>
-                  <td>
-                    <div style={{ fontSize: 13.5, fontWeight: 600 }}>{portal}</div>
-                    <div style={{ fontSize: 12, color: 'var(--c-ink-4)' }}>Try API enabled</div>
-                  </td>
-                  <td>
-                    <div style={{ fontSize: 13.5, fontWeight: 600 }}>{plan}</div>
-                    <div style={{ fontSize: 12, color: 'var(--c-ink-4)' }}>Usage quotas mapped</div>
-                  </td>
-                  <td>
-                    <div style={{ fontSize: 13.5, fontWeight: 600 }}>{api.owner}</div>
-                    <div style={{ fontSize: 12, color: 'var(--c-ink-4)' }}>Workspace role owner</div>
-                  </td>
-                  <td style={{ color: 'var(--c-ink-3)' }}>{api.updatedAt}</td>
-                  <td>
-                    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                      <Button variant="ghost" size="sm" onClick={() => router.push(`/apis/${api.id}`)}>Open</Button>
-                      <Button variant="ghost" size="sm" onClick={() => router.push(`/apis/${api.id}`)}>Test</Button>
-                      <Button variant="danger" size="sm" onClick={() => setDeleteTarget(api.id)}>Delete</Button>
-                    </div>
-                  </td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
-      </div>
+      <DataTable
+        columns={COLUMNS}
+        data={rows}
+        onRowClick={(api) => router.push(buildTenantPath(currentTenant.slug, `/apis/${api.id}`))}
+      />
 
       <Modal
         open={deleteTarget !== null}
@@ -179,7 +156,7 @@ export default function APIsPage() {
         footer={
           <>
             <Button variant="default" onClick={() => setDeleteTarget(null)}>Cancel</Button>
-            <Button variant="danger" onClick={() => void handleDelete()}>Delete API</Button>
+            <Button variant="danger" onClick={() => void handleDelete()} disabled={!canManageApis(currentUser.role)}>Delete API</Button>
           </>
         }
       >
@@ -187,16 +164,6 @@ export default function APIsPage() {
           Deleting this API removes it from the catalog, developer portal, and gateway routing surfaces.
         </p>
       </Modal>
-    </div>
-  )
-}
-
-function MetricCard({ label, value, hint }: { label: string; value: string; hint: string }) {
-  return (
-    <div className="surface-card" style={{ padding: 18 }}>
-      <div className="eyebrow" style={{ color: 'var(--c-ink-4)', marginBottom: 10 }}>{label}</div>
-      <div className="metric-value" style={{ fontSize: 28, fontWeight: 700, marginBottom: 6 }}>{value}</div>
-      <div style={{ fontSize: 12.5, color: 'var(--c-ink-3)' }}>{hint}</div>
-    </div>
+    </PageLayout>
   )
 }

@@ -2,46 +2,52 @@
 
 import PageHeader from '@/components/ui/PageHeader'
 import Card from '@/components/ui/Card'
-import Badge from '@/components/ui/Badge'
+import { DataTable, Column } from '@/components/ui/DataTable'
+import { StatusBadge } from '@/components/ui/StatusBadge'
 import { useStore } from '@/lib/store'
+import { PageLayout } from '@/components/shared/PageLayout'
+
+type QuotaRow = {
+  id: string
+  name: string
+  plan: string
+  minuteLimit: string
+  hourlyLimit: string
+  status: string
+}
+
+const COLUMNS: Column<QuotaRow>[] = [
+  { key: 'name', label: 'API' },
+  { key: 'plan', label: 'Plan' },
+  { key: 'minuteLimit', label: 'Minute limit' },
+  { key: 'hourlyLimit', label: 'Hourly limit' },
+  { key: 'status', label: 'Status', render: (v) => <StatusBadge variant={v === 'Enforced' ? 'success' : 'warning'}>{v as string}</StatusBadge> },
+]
 
 export default function RateLimitsPage() {
   const { apis } = useStore()
+  const rows: QuotaRow[] = apis.map((api) => {
+    const prod = api.environment === 'Production'
+    return {
+      id: api.id,
+      name: api.name,
+      plan: prod ? 'Pro / Enterprise' : 'Sandbox',
+      minuteLimit: prod ? '1,000' : '100',
+      hourlyLimit: prod ? '50,000' : '2,000',
+      status: api.status === 'Active' ? 'Enforced' : 'Draft',
+    }
+  })
 
   return (
-    <div className="page-enter" style={{ padding: 24 }}>
+    <PageLayout>
       <PageHeader
         eyebrow="Traffic Control"
         title="Quota Controls"
       />
 
       <Card title="Quota configuration">
-        <table>
-          <thead>
-            <tr>
-              <th>API</th>
-              <th>Plan</th>
-              <th>Minute limit</th>
-              <th>Hourly limit</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {apis.map((api) => {
-              const production = api.environment === 'Production'
-              return (
-                <tr key={api.id}>
-                  <td>{api.name}</td>
-                  <td>{production ? 'Pro / Enterprise' : 'Sandbox'}</td>
-                  <td>{production ? '1,000' : '100'}</td>
-                  <td>{production ? '50,000' : '2,000'}</td>
-                  <td><Badge variant={api.status === 'Active' ? 'green' : 'amber'}>{api.status === 'Active' ? 'Enforced' : 'Draft'}</Badge></td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
+        <DataTable columns={COLUMNS} data={rows} />
       </Card>
-    </div>
+    </PageLayout>
   )
 }

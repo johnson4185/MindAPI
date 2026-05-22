@@ -1,28 +1,43 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
 import PageHeader from '@/components/ui/PageHeader'
 import Card from '@/components/ui/Card'
 import Badge from '@/components/ui/Badge'
 import Button from '@/components/ui/Button'
+import { DataTable, Column } from '@/components/ui/DataTable'
+import { StatusBadge } from '@/components/ui/StatusBadge'
 import { GovernancePolicy } from '@/lib/types'
-import { fetchJson } from '@/lib/api-client'
+import { PageLayout } from '@/components/shared/PageLayout'
+import { Metric } from '@/components/ui/Metric'
+import { useApiData } from '@/hooks/useApiData'
+
+const COLUMNS: Column<GovernancePolicy>[] = [
+  { key: 'name', label: 'Policy', render: (_, p) => <><div style={{ fontWeight: 700, marginBottom: 4 }}>{p.name}</div><div style={{ fontSize: 12.5, color: 'var(--c-ink-4)' }}>{p.description}</div></> },
+  { key: 'severity', label: 'Severity', render: (v) => <StatusBadge variant={v === 'Critical' ? 'error' : v === 'Warning' ? 'warning' : 'success'}>{v as string}</StatusBadge> },
+  { key: 'compliance', label: 'Compliance', render: (v) => <span style={{ fontFamily: 'var(--f-mono)', fontWeight: 700 }}>{v}%</span> },
+  { key: 'violations', label: 'Violations' },
+]
 
 export default function GovernancePage() {
-  const [policies, setPolicies] = useState<GovernancePolicy[]>([])
+  const { data: policies, loading, error } = useApiData<GovernancePolicy[]>(
+    '/api/mock/governance',
+    {
+      onError: (err) => console.error('Failed to load governance policies:', err),
+    }
+  )
 
-  useEffect(() => {
-    void fetchJson<GovernancePolicy[]>('/api/mock/governance').then(setPolicies)
-  }, [])
-
-  const totals = useMemo(() => ({
-    critical: policies.filter((policy) => policy.severity === 'Critical').length,
-    warning: policies.filter((policy) => policy.severity === 'Warning').length,
-    passing: policies.filter((policy) => policy.severity === 'Passing').length,
-  }), [policies])
+  const policyList = policies || []
+  const critical = policyList.filter((policy) => policy.severity === 'Critical').length
+  const warning = policyList.filter((policy) => policy.severity === 'Warning').length
+  const passing = policyList.filter((policy) => policy.severity === 'Passing').length
 
   return (
-    <div className="page-enter" style={{ padding: 24 }}>
+    <PageLayout>
+      {!!error && (
+        <div className="surface-card" style={{ padding: 14, marginBottom: 16, borderColor: 'var(--danger-bd)', background: 'var(--danger-bg)', color: 'var(--danger)' }}>
+          {error.message}
+        </div>
+      )}
       <PageHeader
         eyebrow="Governance"
         title="Governance Center"
@@ -30,63 +45,44 @@ export default function GovernancePage() {
       />
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 14, marginBottom: 18 }}>
-        <Metric label="Critical" value={String(totals.critical)} variant="red" />
-        <Metric label="Warning" value={String(totals.warning)} variant="amber" />
-        <Metric label="Passing" value={String(totals.passing)} variant="green" />
+        <Metric label="Critical" value={String(critical)} variant="error" />
+        <Metric label="Warning" value={String(warning)} variant="warning" />
+        <Metric label="Passing" value={String(passing)} variant="success" />
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: 18 }}>
-        <Card title="Policy coverage">
-          <table>
-            <thead>
-              <tr>
-                <th>Policy</th>
-                <th>Severity</th>
-                <th>Compliance</th>
-                <th>Violations</th>
-              </tr>
-            </thead>
-            <tbody>
-              {policies.map((policy) => (
-                <tr key={policy.id}>
-                  <td>
-                    <div style={{ fontWeight: 700, marginBottom: 4 }}>{policy.name}</div>
-                    <div style={{ fontSize: 12.5, color: 'var(--c-ink-4)' }}>{policy.description}</div>
-                  </td>
-                  <td><Badge variant={policy.severity === 'Critical' ? 'red' : policy.severity === 'Warning' ? 'amber' : 'green'}>{policy.severity}</Badge></td>
-                  <td>{policy.compliance}%</td>
-                  <td>{policy.violations}</td>
-                </tr>
+      {loading && policyList.length === 0 ? (
+        <div className="surface-card" style={{ padding: 48, textAlign: 'center' }}>
+          <div className="skeleton-block" style={{ width: 120, height: 14, margin: '0 auto 16px' }} />
+          <div className="skeleton-block" style={{ width: 200, height: 28, margin: '0 auto' }} />
+        </div>
+      ) : (
+        <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: 18 }}>
+          <Card title="Policy coverage">
+            <DataTable columns={COLUMNS} data={policyList} />
+          </Card>
+
+          <Card title="Affected APIs">
+            <div style={{ display: 'grid', gap: 0 }}>
+              {policyList.filter((p) => p.failedApis?.length).map((policy, index) => (
+                <div key={policy.id} style={{ padding: '16px 18px', borderTop: index === 0 ? 'none' : '1px solid var(--c-border)' }}>
+                  <div style={{ marginBottom: 8 }}>
+                    <StatusBadge variant={policy.severity === 'Critical' ? 'error' : 'warning'}>{policy.name}</StatusBadge>
+                  </div>
+                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                    {policy.failedApis?.map((api) => <Badge key={api} variant="gray">{api}</Badge>)}
+                  </div>
+                </div>
               ))}
-            </tbody>
-          </table>
-        </Card>
-
-        <Card title="Affected APIs">
-          <div style={{ display: 'grid', gap: 0 }}>
-            {policies.filter((policy) => policy.failedApis?.length).map((policy, index) => (
-              <div key={policy.id} style={{ padding: '16px 18px', borderTop: index === 0 ? 'none' : '1px solid var(--c-border)' }}>
-                <div style={{ marginBottom: 8 }}>
-                  <Badge variant={policy.severity === 'Critical' ? 'red' : 'amber'}>{policy.name}</Badge>
+              {!policyList.filter((p) => p.failedApis?.length).length && (
+                <div className="empty-state" style={{ padding: 48 }}>
+                  <div className="empty-state-title">All policies passing</div>
+                  <div className="empty-state-body">No APIs currently failing governance checks.</div>
                 </div>
-                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                  {policy.failedApis?.map((api) => <Badge key={api} variant="gray">{api}</Badge>)}
-                </div>
-              </div>
-            ))}
-          </div>
-        </Card>
-      </div>
-    </div>
-  )
-}
-
-function Metric({ label, value, variant }: { label: string; value: string; variant: 'red' | 'amber' | 'green' }) {
-  return (
-    <div className="surface-card" style={{ padding: 18 }}>
-      <div className="eyebrow" style={{ color: 'var(--c-ink-4)', marginBottom: 10 }}>{label}</div>
-      <div style={{ marginBottom: 8 }}><Badge variant={variant}>{label}</Badge></div>
-      <div className="metric-value" style={{ fontSize: 26, fontWeight: 700 }}>{value}</div>
-    </div>
+              )}
+            </div>
+          </Card>
+        </div>
+      )}
+    </PageLayout>
   )
 }

@@ -1,13 +1,17 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import PageHeader from '@/components/ui/PageHeader'
 import Button from '@/components/ui/Button'
 import Card from '@/components/ui/Card'
-import Badge from '@/components/ui/Badge'
-import { DashboardSnapshot } from '@/lib/types'
-import { fetchJson } from '@/lib/api-client'
+import { DataTable, Column } from '@/components/ui/DataTable'
+import { StatusBadge } from '@/components/ui/StatusBadge'
+import { DashboardSnapshot, API } from '@/lib/types'
+import { useStore } from '@/lib/store'
+import { buildTenantPath } from '@/lib/tenant-routing'
+import { PageLayout } from '@/components/shared/PageLayout'
+import { Metric } from '@/components/ui/Metric'
+import { useApiData } from '@/hooks/useApiData'
 
 const FALLBACK: DashboardSnapshot = {
   totals: { apis: 0, published: 0, drafts: 0, consumers: 0, requests24h: '0' },
@@ -15,99 +19,99 @@ const FALLBACK: DashboardSnapshot = {
   alerts: [],
 }
 
+const API_COLUMNS: Column<API>[] = [
+  { key: 'name', label: 'API' },
+  { key: 'version', label: 'Version' },
+  { key: 'environment', label: 'Environment' },
+  { key: 'status', label: 'Status', render: (v) => <StatusBadge variant={v === 'Active' ? 'success' : v === 'Draft' ? 'info' : 'warning'}>{v as string}</StatusBadge> },
+]
+
 export default function DashboardPage() {
   const router = useRouter()
-  const [snapshot, setSnapshot] = useState<DashboardSnapshot>(FALLBACK)
+  const { currentTenant } = useStore()
+  const { data: snapshot, loading, error } = useApiData<DashboardSnapshot>(
+    '/api/mock/dashboard',
+    {
+      onError: (err) => console.error('Failed to load dashboard:', err),
+    }
+  )
 
-  useEffect(() => {
-    void fetchJson<DashboardSnapshot>('/api/mock/dashboard').then(setSnapshot)
-  }, [])
+  const displayData = snapshot || FALLBACK
 
   return (
-    <div className="page-enter" style={{ padding: 24 }}>
+    <PageLayout>
+      {!!error && (
+        <div className="surface-card" style={{ padding: 14, marginBottom: 16, borderColor: 'var(--danger-bd)', background: 'var(--danger-bg)', color: 'var(--danger)' }}>
+          {error.message}
+        </div>
+      )}
       <PageHeader
         eyebrow="Platform Overview"
         title="Platform Command Center"
         actions={
           <>
-            <Button variant="default" size="lg" onClick={() => router.push('/analytics')}>Open analytics</Button>
-            <Button variant="primary" size="lg" onClick={() => router.push('/apis/publish')}>Publish API</Button>
+            <Button variant="default" size="lg" onClick={() => router.push(buildTenantPath(currentTenant.slug, '/analytics'))}>Open analytics</Button>
+            <Button variant="primary" size="lg" onClick={() => router.push(buildTenantPath(currentTenant.slug, '/apis/publish'))}>Publish API</Button>
           </>
         }
       />
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, minmax(0, 1fr))', gap: 14, marginBottom: 18 }}>
-        <Metric label="APIs" value={String(snapshot.totals.apis)} />
-        <Metric label="Published" value={String(snapshot.totals.published)} />
-        <Metric label="Drafts" value={String(snapshot.totals.drafts)} />
-        <Metric label="Consumers" value={String(snapshot.totals.consumers)} />
-        <Metric label="Requests / 24h" value={snapshot.totals.requests24h} />
-      </div>
-
-      <div style={{ display: 'grid', gridTemplateColumns: '1.3fr 1fr', gap: 18, marginBottom: 18 }}>
-        <Card title="Recent APIs" subtitle="Latest catalog changes">
-          <table>
-            <thead>
-              <tr>
-                <th>API</th>
-                <th>Version</th>
-                <th>Environment</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {snapshot.recentApis.map((api) => (
-                <tr key={api.id}>
-                  <td>{api.name}</td>
-                  <td>{api.version}</td>
-                  <td>{api.environment}</td>
-                  <td><Badge variant={api.status === 'Active' ? 'green' : api.status === 'Draft' ? 'blue' : 'amber'}>{api.status}</Badge></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </Card>
-
-        <Card title="Alerts" subtitle="What needs attention">
-          <div style={{ display: 'grid', gap: 0 }}>
-            {snapshot.alerts.map((alert, index) => (
-              <div key={alert.id} style={{ padding: '16px 18px', borderTop: index === 0 ? 'none' : '1px solid var(--c-border)' }}>
-                <div style={{ marginBottom: 8 }}>
-                  <Badge variant={alert.severity === 'Critical' ? 'red' : alert.severity === 'Warning' ? 'amber' : 'blue'}>{alert.severity}</Badge>
-                </div>
-                <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 6 }}>{alert.title}</div>
-                <div style={{ fontSize: 13, color: 'var(--c-ink-3)', lineHeight: 1.6 }}>{alert.message}</div>
-              </div>
+      {loading ? (
+        <div className="surface-card" style={{ padding: 48, textAlign: 'center', marginBottom: 18 }}>
+          <div className="skeleton-block" style={{ width: 160, height: 14, margin: '0 auto 16px' }} />
+          <div className="skeleton-block" style={{ width: 300, height: 28, margin: '0 auto 24px' }} />
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 14 }}>
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="skeleton-block" style={{ height: 80 }} />
             ))}
           </div>
-        </Card>
-      </div>
+        </div>
+      ) : (
+        <>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, minmax(0, 1fr))', gap: 14, marginBottom: 18 }}>
+            <Metric label="APIs" value={String(displayData.totals.apis)} />
+            <Metric label="Published" value={String(displayData.totals.published)} />
+            <Metric label="Drafts" value={String(displayData.totals.drafts)} />
+            <Metric label="Consumers" value={String(displayData.totals.consumers)} />
+            <Metric label="Requests / 24h" value={displayData.totals.requests24h} />
+          </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 18 }}>
-        <ActionCard title="API Catalog" body="Browse publishing status, versions, and gateway posture." action="Open catalog" onClick={() => router.push('/apis')} />
-        <ActionCard title="Developer Portal" body="Manage plans, onboarding, and app access." action="Open portal" onClick={() => router.push('/portal')} />
-        <ActionCard title="Consumer Registry" body="Review keys, subscriptions, and account health." action="Open consumers" onClick={() => router.push('/consumers')} />
-      </div>
-    </div>
-  )
-}
+          <div style={{ display: 'grid', gridTemplateColumns: '1.3fr 1fr', gap: 18, marginBottom: 18 }}>
+            <Card title="Recent APIs" subtitle="Latest catalog changes">
+              <DataTable columns={API_COLUMNS} data={displayData.recentApis} />
+            </Card>
 
-function Metric({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="surface-card" style={{ padding: 18 }}>
-      <div className="eyebrow" style={{ color: 'var(--c-ink-4)', marginBottom: 10 }}>{label}</div>
-      <div className="metric-value" style={{ fontSize: 26, fontWeight: 700 }}>{value}</div>
-    </div>
-  )
-}
+            <Card title="Alerts" subtitle="What needs attention">
+              <div style={{ display: 'grid', gap: 0 }}>
+                {displayData.alerts.map((alert, index) => (
+                  <div key={alert.id} style={{ padding: '16px 18px', borderTop: index === 0 ? 'none' : '1px solid var(--c-border)' }}>
+                    <div style={{ marginBottom: 8 }}>
+                      <StatusBadge variant={alert.severity === 'Critical' ? 'error' : alert.severity === 'Warning' ? 'warning' : 'info'}>{alert.severity}</StatusBadge>
+                    </div>
+                    <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 6 }}>{alert.title}</div>
+                    <div style={{ fontSize: 13, color: 'var(--c-ink-3)', lineHeight: 1.6 }}>{alert.message}</div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </div>
 
-function ActionCard({ title, body, action, onClick }: { title: string; body: string; action: string; onClick: () => void }) {
-  return (
-    <Card title={title}>
-      <div style={{ padding: 18 }}>
-        <div style={{ fontSize: 13.5, color: 'var(--c-ink-3)', lineHeight: 1.7, marginBottom: 14 }}>{body}</div>
-        <Button variant="default" size="sm" onClick={onClick}>{action}</Button>
-      </div>
-    </Card>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 18 }}>
+            {[
+              { title: 'API Catalog', body: 'Browse publishing status, versions, and gateway posture.', action: 'Open catalog', href: '/apis' },
+              { title: 'Developer Portal', body: 'Manage plans, onboarding, and app access.', action: 'Open portal', href: '/portal' },
+              { title: 'Consumer Registry', body: 'Review keys, subscriptions, and account health.', action: 'Open consumers', href: '/consumers' },
+            ].map((item) => (
+              <Card key={item.title} title={item.title}>
+                <div style={{ padding: 18 }}>
+                  <div style={{ fontSize: 13.5, color: 'var(--c-ink-3)', lineHeight: 1.7, marginBottom: 14 }}>{item.body}</div>
+                  <Button variant="default" size="sm" onClick={() => router.push(buildTenantPath(currentTenant.slug, item.href))}>{item.action}</Button>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </>
+      )}
+    </PageLayout>
   )
 }
