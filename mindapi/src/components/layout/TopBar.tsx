@@ -8,7 +8,7 @@ import { buildTenantPath, stripTenantPrefix } from '@/lib/tenant-routing'
 const ENVIRONMENTS = [
   { label: 'Production', color: '#0aaa6b', bg: 'rgba(10,170,107,0.1)', border: 'rgba(10,170,107,0.25)' },
   { label: 'Staging', color: '#c97c0a', bg: 'rgba(201,124,10,0.1)', border: 'rgba(201,124,10,0.25)' },
-  { label: 'Development', color: '#3b6ef8', bg: 'rgba(59,110,248,0.1)', border: 'rgba(59,110,248,0.25)' },
+  { label: 'Development', color: '#1A5FB4', bg: 'rgba(26,95,180,0.1)', border: 'rgba(26,95,180,0.25)' },
 ]
 
 const ROLES = ['Owner', 'Admin', 'Developer', 'Viewer', 'Billing'] as const
@@ -90,7 +90,7 @@ export default function TopBar() {
         </span>
         <kbd style={{
           display: 'inline-flex', alignItems: 'center', gap: 3,
-          fontFamily: 'var(--f-mono)', fontSize: 10.5, color: 'var(--c-ink-5)',
+          fontFamily: 'var(--f-mono)', fontSize: 11, color: 'var(--c-ink-5)',
           background: 'var(--c-panel-soft)', border: '1px solid var(--c-border)',
           padding: '1px 5px', borderRadius: 4,
         }}>
@@ -105,20 +105,19 @@ export default function TopBar() {
         type="button"
         onClick={() => setEnvIndex((i) => (i + 1) % ENVIRONMENTS.length)}
         style={{
-          display: 'inline-flex', alignItems: 'center', gap: 7,
-          height: 34, padding: '0 13px',
-          background: env.bg,
-          border: `1.5px solid ${env.border}`,
-          borderRadius: 20,
+          height: 30,
+          padding: '0 10px',
+          background: 'var(--c-panel)',
+          border: '1.5px solid var(--c-border)',
+          borderRadius: 'var(--r-sm)',
           cursor: 'pointer',
-          fontSize: 13, fontWeight: 600,
-          color: env.color,
-          transition: 'opacity var(--t-fast)',
+          fontSize: 13, fontWeight: 500,
+          color: 'var(--c-ink-3)',
+          transition: 'all var(--t-fast)',
           whiteSpace: 'nowrap',
         }}
         title="Click to switch environment"
       >
-        <span style={{ width: 7, height: 7, borderRadius: '50%', background: env.color, flexShrink: 0 }} />
         {env.label}
       </button>
 
@@ -206,7 +205,7 @@ export default function TopBar() {
               position: 'absolute', top: -3, right: -3,
               minWidth: 16, height: 16, borderRadius: 8,
               background: 'var(--accent)', color: '#fff',
-              fontSize: 10, fontWeight: 700,
+              fontSize: 11, fontWeight: 700,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               padding: '0 4px', border: '2px solid var(--c-bg)',
             }}>
@@ -219,13 +218,13 @@ export default function TopBar() {
           <div style={{
             position: 'absolute', right: 0, top: 'calc(100% + 8px)',
             width: 320, background: 'var(--c-panel)',
-            border: '1.5px solid var(--c-border)', borderRadius: 12,
+            border: '1.5px solid var(--c-border)', borderRadius: 'var(--r-lg)',
             boxShadow: 'var(--shadow-lg)',
             zIndex: 50, overflow: 'hidden',
           }}>
             <div style={{ padding: '14px 18px 10px', borderBottom: '1px solid var(--c-border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--c-ink)' }}>Notifications</div>
-              <div style={{ fontSize: 12, color: 'var(--c-ink-4)' }}>{unread.length} unread</div>
+              <div style={{ fontSize: 13, color: 'var(--c-ink-4)' }}>{unread.length} unread</div>
             </div>
             <div style={{ maxHeight: 320, overflowY: 'auto' }}>
               {notifications.length === 0 ? (
@@ -245,7 +244,7 @@ export default function TopBar() {
                     style={{
                       width: '100%', textAlign: 'left', display: 'block',
                       padding: '12px 18px',
-                      background: n.read ? 'transparent' : 'rgba(59,110,248,0.04)',
+                      background: n.read ? 'transparent' : 'rgba(26,95,180,0.04)',
                       borderBottom: '1px solid var(--c-border)',
                       cursor: 'pointer', border: 'none', borderTop: 'none', borderLeft: 'none', borderRight: 'none',
                     }}
@@ -254,7 +253,7 @@ export default function TopBar() {
                       {!n.read && <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--accent)', flexShrink: 0, marginTop: 5 }} />}
                       <div style={{ paddingLeft: n.read ? 14 : 0 }}>
                         <div style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--c-ink)', marginBottom: 2 }}>{n.title}</div>
-                        <div style={{ fontSize: 12.5, color: 'var(--c-ink-3)', lineHeight: 1.5 }}>{n.message}</div>
+                        <div style={{ fontSize: 13, color: 'var(--c-ink-3)', lineHeight: 1.5 }}>{n.message}</div>
                       </div>
                     </div>
                   </button>
@@ -272,7 +271,7 @@ export default function TopBar() {
           display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
           width: 36, height: 36,
           background: 'linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%)',
-          color: '#fff', fontSize: 12.5, fontWeight: 800,
+          color: '#fff', fontSize: 13, fontWeight: 800,
           borderRadius: 9,
           boxShadow: '0 2px 6px var(--accent-glow)',
           letterSpacing: '0.04em',

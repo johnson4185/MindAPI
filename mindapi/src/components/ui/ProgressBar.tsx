@@ -39,9 +39,9 @@ export function ProgressBar({
     <div style={{ display: 'flex', flexDirection: 'column', gap: 6, ...style }}>
       {(label || showPercent) && (
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          {label && <span style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--c-ink-3)' }}>{label}</span>}
+          {label && <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--c-ink-3)' }}>{label}</span>}
           {showPercent && (
-            <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--c-ink-4)', fontFamily: 'var(--f-mono)' }}>
+            <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--c-ink-4)', fontFamily: 'var(--f-mono)' }}>
               {pct}%
             </span>
           )}

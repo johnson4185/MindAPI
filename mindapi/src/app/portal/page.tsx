@@ -133,14 +133,14 @@ export default function PortalPage() {
         <div className="surface-card" style={{ padding: 14, marginBottom: 16, borderColor: 'var(--danger-bd)', background: 'var(--danger-bg)', color: 'var(--danger)' }}>{portalError.message}</div>
       )}
 
-      <PageHeader eyebrow="Developer Portal" title="Developer Experience" />
+      <PageHeader prefix="Portal" title="Developer Experience" />
 
       <Tabs
         tabs={[
           { id: 'overview', label: 'Overview' },
           { id: 'documentation', label: 'Documentation' },
           { id: 'applications', label: 'Applications' },
-          { id: 'webhooks', label: 'Webhooks', badge: (webhooksData ?? []).length > 0 ? <span style={{ fontSize: 11, color: 'var(--c-ink-4)', marginLeft: 4 }}>({(webhooksData ?? []).length})</span> : undefined },
+          { id: 'webhooks', label: 'Webhooks', badge: (webhooksData ?? []).length > 0 ? <span style={{ fontSize: 12, color: 'var(--c-ink-4)', marginLeft: 4 }}>({(webhooksData ?? []).length})</span> : undefined },
         ]}
         activeTab={activeTab}
         onChange={setActiveTab}

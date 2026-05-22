@@ -31,10 +31,10 @@ export function Tabs({ tabs, activeTab, onChange, variant = 'underline' }: TabsP
               type="button"
               onClick={() => onChange(tab.id)}
               style={{
-                padding: '8px 16px',
-                borderRadius: 20,
+                padding: '7px 14px',
+                borderRadius: 'var(--r-md)',
                 border: `1.5px solid ${isActive ? 'var(--accent)' : 'var(--c-border)'}`,
-                background: isActive ? 'rgba(232,72,28,0.08)' : 'var(--c-panel)',
+                background: isActive ? 'rgba(26,95,180,0.08)' : 'var(--c-panel)',
                 color: isActive ? 'var(--accent)' : 'var(--c-ink-3)',
                 fontWeight: isActive ? 700 : 500,
                 fontSize: 13.5,
@@ -43,7 +43,6 @@ export function Tabs({ tabs, activeTab, onChange, variant = 'underline' }: TabsP
                 alignItems: 'center',
                 gap: 6,
                 transition: 'all var(--t-fast)',
-                boxShadow: isActive ? '0 0 0 3px var(--accent-glow)' : 'none',
               }}
             >
               {tab.icon}

@@ -124,7 +124,7 @@ export default function CommandPalette() {
             placeholder="Search pages, APIs, and consumers"
             style={{ flex: 1, border: 'none', padding: 0, background: 'transparent' }}
           />
-          <span style={{ fontSize: 11, color: 'var(--c-ink-4)' }}>Esc</span>
+          <span style={{ fontSize: 12, color: 'var(--c-ink-4)' }}>Esc</span>
         </div>
 
         <div style={{ maxHeight: 420, overflowY: 'auto' }}>
@@ -150,7 +150,7 @@ export default function CommandPalette() {
                 <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--c-ink)' }}>{item.label}</div>
                 <div style={{ fontSize: 12.5, color: 'var(--c-ink-4)', marginTop: 4 }}>{item.description}</div>
               </span>
-              <span style={{ fontSize: 11, color: typeColor(item.type), textTransform: 'uppercase', letterSpacing: '0.08em' }}>{item.type}</span>
+              <span style={{ fontSize: 12, color: typeColor(item.type), textTransform: 'uppercase', letterSpacing: '0.08em' }}>{item.type}</span>
             </button>
           ))}
         </div>

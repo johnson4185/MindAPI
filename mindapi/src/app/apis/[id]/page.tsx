@@ -6,6 +6,8 @@ import Breadcrumb from '@/components/ui/Breadcrumb'
 import Button from '@/components/ui/Button'
 import Card from '@/components/ui/Card'
 import Badge from '@/components/ui/Badge'
+import { Metric } from '@/components/ui/Metric'
+import { PageLayout } from '@/components/shared/PageLayout'
 import { useStore } from '@/lib/store'
 import { HttpMethod } from '@/lib/types'
 import { buildTenantPath } from '@/lib/tenant-routing'
@@ -57,17 +59,17 @@ export default function APIDetailPage({ params }: { params: Promise<{ id: string
   }
 
   return (
-    <div className="page-enter" style={{ padding: 24 }}>
+    <PageLayout>
       <Breadcrumb items={[{ label: 'API Catalog', href: buildTenantPath(currentTenant.slug, '/apis') }, { label: api.name }]} />
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', gap: 18, alignItems: 'flex-start', flexWrap: 'wrap', marginBottom: 20 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', gap: 18, alignItems: 'flex-start', flexWrap: 'wrap', marginBottom: 18 }}>
         <div style={{ maxWidth: 860 }}>
-          <div className="eyebrow" style={{ color: 'var(--accent)', marginBottom: 8 }}>API Detail</div>
+          <div className="eyebrow" style={{ color: 'var(--accent)', marginBottom: 8 }}>Detail</div>
           <h1 style={{ marginBottom: 10 }}>{api.name}</h1>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            <Badge variant={api.status === 'Active' ? 'green' : api.status === 'Draft' ? 'blue' : 'amber'}>{api.status}</Badge>
-            <Badge variant="blue">{api.version}</Badge>
-            <Badge variant="gray">{api.environment}</Badge>
+            <Badge variant={api.status === 'Active' ? 'green' : api.status === 'Draft' ? 'amber' : 'red'} dot>{api.status}</Badge>
+            <Badge variant="gray">{api.version}</Badge>
+            <Badge variant="blue">{api.environment}</Badge>
             <Badge variant={api.security.length ? 'blue' : 'amber'}>{api.security.join(' / ') || 'Auth required'}</Badge>
           </div>
         </div>
@@ -78,10 +80,10 @@ export default function APIDetailPage({ params }: { params: Promise<{ id: string
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 14, marginBottom: 18 }}>
-        <Metric title="Requests / 24h" value={api.requests24h} hint="Runtime demand" />
-        <Metric title="Endpoints" value={String(endpointRows.length)} hint="Configured operations" />
-        <Metric title="Portal status" value={api.status === 'Active' ? 'Live docs' : 'Draft docs'} hint="Developer-facing visibility" />
-        <Metric title="Plan mapping" value={api.environment === 'Production' ? '2 plans' : 'Sandbox'} hint="Monetization readiness" />
+        <Metric label="Requests / 24h" value={api.requests24h} hint="Runtime demand" />
+        <Metric label="Endpoints" value={String(endpointRows.length)} hint="Configured operations" />
+        <Metric label="Portal status" value={api.status === 'Active' ? 'Live docs' : 'Draft docs'} hint="Developer-facing visibility" />
+        <Metric label="Plan mapping" value={api.environment === 'Production' ? '2 plans' : 'Sandbox'} hint="Monetization readiness" />
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: 18, marginBottom: 18 }}>
@@ -161,11 +163,11 @@ export default function APIDetailPage({ params }: { params: Promise<{ id: string
         <Card title="Response inspector" subtitle="Body, status, and product context">
           <div style={{ padding: 18 }}>
             {response ? (
-              <pre style={{ margin: 0, padding: 16, border: '1px solid var(--c-border)', background: 'var(--c-panel-soft)', fontSize: 12.5, lineHeight: 1.7, overflow: 'auto', fontFamily: 'var(--f-mono)' }}>
+              <pre style={{ margin: 0, padding: 16, border: '1px solid var(--c-border)', background: 'var(--c-panel-soft)', fontSize: 13, lineHeight: 1.7, overflow: 'auto', fontFamily: 'var(--f-mono)' }}>
                 {response}
               </pre>
             ) : (
-              <div style={{ padding: 28, border: '1px solid var(--c-border)', background: 'var(--c-panel-soft)', fontSize: 13.5, color: 'var(--c-ink-3)', lineHeight: 1.7 }}>
+              <div style={{ padding: 24, border: '1px solid var(--c-border)', background: 'var(--c-panel-soft)', fontSize: 13.5, color: 'var(--c-ink-3)', lineHeight: 1.7 }}>
                 Run a request to preview the built-in console. In production, this should connect to sandbox, staging, or live environments with credential controls and saved collections.
               </div>
             )}
@@ -173,24 +175,14 @@ export default function APIDetailPage({ params }: { params: Promise<{ id: string
         </Card>
       </div>
 
-    </div>
-  )
-}
-
-function Metric({ title, value, hint }: { title: string; value: string; hint: string }) {
-  return (
-    <div className="surface-card" style={{ padding: 18 }}>
-      <div className="eyebrow" style={{ color: 'var(--c-ink-4)', marginBottom: 10 }}>{title}</div>
-      <div className="metric-value" style={{ fontSize: 26, fontWeight: 700, marginBottom: 6 }}>{value}</div>
-      <div style={{ fontSize: 12.5, color: 'var(--c-ink-3)' }}>{hint}</div>
-    </div>
+    </PageLayout>
   )
 }
 
 function Row({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
   return (
     <div style={{ display: 'grid', gridTemplateColumns: '160px 1fr', gap: 16, padding: '14px 18px', borderTop: '1px solid var(--c-border)' }}>
-      <div style={{ fontSize: 12.5, color: 'var(--c-ink-4)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{label}</div>
+      <div style={{ fontSize: 13, color: 'var(--c-ink-4)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{label}</div>
       <div style={{ fontSize: 13.5, color: 'var(--c-ink-2)', lineHeight: 1.7, fontFamily: mono ? 'var(--f-mono)' : 'inherit' }}>{value}</div>
     </div>
   )

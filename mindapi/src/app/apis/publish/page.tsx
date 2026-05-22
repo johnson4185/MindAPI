@@ -105,7 +105,7 @@ function slugify(value: string) {
 }
 
 const METHOD_COLORS: Record<HttpMethod, { bg: string; color: string; border: string }> = {
-  GET: { bg: 'rgba(59,110,248,0.1)', color: '#3b6ef8', border: 'rgba(59,110,248,0.25)' },
+  GET: { bg: 'rgba(26,95,180,0.1)', color: '#1A5FB4', border: 'rgba(26,95,180,0.25)' },
   POST: { bg: 'rgba(10,170,107,0.1)', color: '#0aaa6b', border: 'rgba(10,170,107,0.25)' },
   PUT: { bg: 'rgba(201,124,10,0.1)', color: '#c97c0a', border: 'rgba(201,124,10,0.25)' },
   PATCH: { bg: 'rgba(124,58,237,0.1)', color: '#7c3aed', border: 'rgba(124,58,237,0.25)' },
@@ -291,9 +291,8 @@ function PublishPage() {
 
   return (
     <div className="page-enter" style={{ padding: '28px 32px', maxWidth: 1400, margin: '0 auto' }}>
-      <PageHeader
-        eyebrow="APIs"
-        title="Publish New API"
+      <PageHeader        prefix="APIs"
+            title="Publish New API"
         actions={
           <div style={{ display: 'flex', gap: 8 }}>
             <Button variant="default" size="md" onClick={() => void publish(true)}>Save Draft</Button>
@@ -304,8 +303,7 @@ function PublishPage() {
 
       {/* Step progress */}
       <div style={{
-        background: 'var(--c-panel)', border: '1.5px solid var(--c-border)',
-        borderRadius: 14, padding: '24px 28px', marginBottom: 24,
+        background: 'var(--c-panel)', border: '1.5px solid var(--c-border)',            borderRadius: 'var(--r-xl)', padding: '24px 28px', marginBottom: 24,
         boxShadow: 'var(--shadow-sm)',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 0 }}>
@@ -372,14 +370,14 @@ function PublishPage() {
         {/* Main form panel */}
         <div style={{
           background: 'var(--c-panel)', border: '1.5px solid var(--c-border)',
-          borderRadius: 14, padding: '32px 36px',
+          borderRadius: 'var(--r-xl)', padding: '32px 36px',
           boxShadow: 'var(--shadow-sm)',
         }}>
           {/* Step header */}
           <div style={{ marginBottom: 28, paddingBottom: 20, borderBottom: '1px solid var(--c-border)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
               <div style={{
-                width: 44, height: 44, borderRadius: 12, flexShrink: 0,
+                width: 44, height: 44, borderRadius: 'var(--r-lg)', flexShrink: 0,
                 background: 'linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 color: '#fff', fontSize: 16, fontWeight: 800,
@@ -402,7 +400,7 @@ function PublishPage() {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
                 <button type="button" onClick={() => setMode('import')} style={sourceCardStyle(mode === 'import')}>
                   <div style={{
-                    width: 44, height: 44, borderRadius: 10, marginBottom: 14,
+                    width: 44, height: 44, borderRadius: 'var(--r-md)', marginBottom: 14,
                     background: mode === 'import' ? 'var(--accent)' : 'var(--c-panel-soft)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     border: `1.5px solid ${mode === 'import' ? 'var(--accent-strong)' : 'var(--c-border)'}`,
@@ -425,8 +423,7 @@ function PublishPage() {
                 </button>
 
                 <button type="button" onClick={startManualMode} style={sourceCardStyle(mode === 'manual')}>
-                  <div style={{
-                    width: 44, height: 44, borderRadius: 10, marginBottom: 14,
+                  <div style={{                      width: 44, height: 44, borderRadius: 'var(--r-md)', marginBottom: 14,
                     background: mode === 'manual' ? 'var(--accent)' : 'var(--c-panel-soft)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     border: `1.5px solid ${mode === 'manual' ? 'var(--accent-strong)' : 'var(--c-border)'}`,
@@ -455,11 +452,11 @@ function PublishPage() {
                     onClick={() => fileRef.current?.click()}
                     style={{
                       border: '2px dashed var(--c-border)', background: 'var(--c-panel-soft)',
-                      borderRadius: 10, padding: '36px 24px', textAlign: 'center', cursor: 'pointer',
+                      borderRadius: 'var(--r-md)', padding: '36px 24px', textAlign: 'center', cursor: 'pointer',
                       transition: 'border-color var(--t-fast)',
                     }}
                   >
-                    <div style={{ width: 48, height: 48, borderRadius: 12, background: 'var(--c-panel)', border: '1.5px solid var(--c-border)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px' }}>
+                    <div style={{                    width: 48, height: 48, borderRadius: 'var(--r-lg)', background: 'var(--c-panel)', border: '1.5px solid var(--c-border)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px' }}>
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--c-ink-4)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" />
                       </svg>
@@ -471,7 +468,7 @@ function PublishPage() {
                       OpenAPI 3.x, Swagger 2.0, Postman collections · JSON or YAML
                     </div>
                     {!fileName && (
-                      <div style={{ marginTop: 14, display: 'inline-flex', padding: '7px 16px', background: 'var(--c-panel)', border: '1.5px solid var(--c-border)', borderRadius: 8, fontSize: 13, fontWeight: 600, color: 'var(--c-ink-2)' }}>
+                      <div style={{ marginTop: 14, display: 'inline-flex', padding: '7px 16px', background: 'var(--c-panel)', border: '1.5px solid var(--c-border)', borderRadius: 'var(--r-sm)', fontSize: 13, fontWeight: 600, color: 'var(--c-ink-2)' }}>
                         Browse files
                       </div>
                     )}
@@ -511,8 +508,8 @@ function PublishPage() {
                           style={{
                             textAlign: 'left', padding: '18px 20px',
                             border: `1.5px solid ${selectedId === candidate.id ? 'var(--accent)' : 'var(--c-border)'}`,
-                            borderRadius: 10,
-                            background: selectedId === candidate.id ? 'rgba(232,72,28,0.04)' : 'var(--c-panel)',
+                            borderRadius: 'var(--r-md)',
+                            background: selectedId === candidate.id ? 'rgba(26,95,180,0.04)' : 'var(--c-panel)',
                             cursor: 'pointer',
                             boxShadow: selectedId === candidate.id ? '0 0 0 3px var(--accent-glow)' : 'var(--shadow-sm)',
                             transition: 'all var(--t-fast)',
@@ -546,7 +543,7 @@ function PublishPage() {
                           <Button variant="default" size="sm" onClick={() => toggleAllOperations(false)}>Clear all</Button>
                         </div>
                       </div>
-                      <div style={{ border: '1.5px solid var(--c-border)', borderRadius: 10, overflow: 'hidden' }}>
+                      <div style={{ border: '1.5px solid var(--c-border)', borderRadius: 'var(--r-md)', overflow: 'hidden' }}>
                         {Object.entries(groupOperationsBySegment(operations)).map(([segment, groupedOps], gi) => (
                           <div key={segment}>
                             <div style={{ padding: '8px 16px', background: 'var(--c-panel-soft)', borderBottom: '1px solid var(--c-border)', borderTop: gi > 0 ? '1px solid var(--c-border)' : 'none', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--c-ink-4)' }}>
@@ -575,9 +572,9 @@ function PublishPage() {
                   )}
                 </>
               ) : (
-                <div style={{ padding: '20px 22px', border: '1.5px solid var(--c-border)', borderRadius: 10, background: 'var(--c-panel-soft)' }}>
+                <div style={{ padding: '20px 22px', border: '1.5px solid var(--c-border)', borderRadius: 'var(--r-md)', background: 'var(--c-panel-soft)' }}>
                   <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-                    <div style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--blue-soft)', border: '1.5px solid var(--blue-line)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <div style={{ width: 32, height: 32, borderRadius: 'var(--r-sm)', background: 'var(--blue-soft)', border: '1.5px solid var(--blue-line)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--blue-ink)" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
                     </div>
                     <div>
@@ -595,8 +592,7 @@ function PublishPage() {
           {/* Step 1: Basic Info */}
           {step === 1 && (
             <div style={{ display: 'grid', gap: 20 }}>
-              {selected && (
-                <div style={{ padding: '14px 18px', background: 'rgba(232,72,28,0.06)', border: '1.5px solid rgba(232,72,28,0.2)', borderRadius: 10, fontSize: 13.5, color: 'var(--c-ink-3)', lineHeight: 1.6 }}>
+              {selected && (                  <div style={{ padding: '14px 18px', background: 'rgba(26,95,180,0.06)', border: '1.5px solid rgba(26,95,180,0.2)', borderRadius: 'var(--r-md)', fontSize: 13.5, color: 'var(--c-ink-3)', lineHeight: 1.6 }}>
                   Imported from <strong>{selected.sourceLabel}</strong>. Identity fields are still editable — detected operations and server details carry forward.
                 </div>
               )}
@@ -714,11 +710,11 @@ function PublishPage() {
               </div>
 
               {routeMode === 'proxy' ? (
-                <div style={{ padding: '18px 20px', border: '1.5px solid var(--c-border)', borderRadius: 10, background: 'var(--c-panel-soft)', fontSize: 13.5, color: 'var(--c-ink-3)', lineHeight: 1.7 }}>
+                <div style={{ padding: '18px 20px', border: '1.5px solid var(--c-border)', borderRadius: 'var(--r-md)', background: 'var(--c-panel-soft)', fontSize: 13.5, color: 'var(--c-ink-3)', lineHeight: 1.7 }}>
                   Proxy mode publishes the API using the base path and backend target. Route matching can be refined after publishing once a formal contract is available.
                 </div>
               ) : (
-                <div style={{ border: '1.5px solid var(--c-border)', borderRadius: 10, overflow: 'hidden' }}>
+                <div style={{ border: '1.5px solid var(--c-border)', borderRadius: 'var(--r-md)', overflow: 'hidden' }}>
                   {operations.length === 0 ? (
                     <div style={{ padding: '20px', fontSize: 13.5, color: 'var(--c-ink-3)' }}>No operations defined yet.</div>
                   ) : (
@@ -746,25 +742,25 @@ function PublishPage() {
             <div style={{ display: 'grid', gap: 14 }}>
               {(
                 [
-                  ['api-key', 'API Key', 'Validate requests with an API key header. Simple and widely supported.', '🔑'],
-                  ['oauth2', 'OAuth 2.0', 'Use an authorization server or introspection endpoint for token validation.', '🔐'],
-                  ['jwt', 'JWT Validation', 'Verify cryptographically signed JWTs at the gateway edge. No upstream calls required.', '🛡️'],
-                  ['basic', 'Basic Auth', 'HTTP Basic credentials validated per-consumer. Best for internal or controlled integrations.', '🔒'],
-                  ['none', 'No Authentication', 'Expose a public or internally trusted API route. Use with extreme caution in production.', '🌐'],
+                  ['api-key', 'API Key', 'Validate requests with an API key header. Simple and widely supported.', 'key'],
+                  ['oauth2', 'OAuth 2.0', 'Use an authorization server or introspection endpoint for token validation.', 'oauth'],
+                  ['jwt', 'JWT Validation', 'Verify cryptographically signed JWTs at the gateway edge. No upstream calls required.', 'jwt'],
+                  ['basic', 'Basic Auth', 'HTTP Basic credentials validated per-consumer. Best for internal or controlled integrations.', 'basic'],
+                  ['none', 'No Authentication', 'Expose a public or internally trusted API route. Use with extreme caution in production.', 'none'],
                 ] as const
               ).map(([value, label, description, emoji]) => (
                 <label key={value} style={{
                   display: 'grid', gridTemplateColumns: '22px 40px minmax(0, 1fr)',
                   gap: 16, alignItems: 'center', padding: '20px 22px',
                   border: `1.5px solid ${form.authType === value ? 'var(--accent)' : 'var(--c-border)'}`,
-                  borderRadius: 10,
-                  background: form.authType === value ? 'rgba(232,72,28,0.05)' : 'var(--c-panel)',
+                  borderRadius: 'var(--r-md)',
+                  background: form.authType === value ? 'rgba(26,95,180,0.05)' : 'var(--c-panel)',
                   cursor: 'pointer',
                   boxShadow: form.authType === value ? '0 0 0 3px var(--accent-glow)' : 'var(--shadow-sm)',
                   transition: 'all var(--t-fast)',
                 }}>
                   <input type="radio" name="authType" checked={form.authType === value} onChange={() => setField('authType', value)} style={{ width: 16, height: 16, accentColor: 'var(--accent)', margin: 0 }} />
-                  <div style={{ fontSize: 24, lineHeight: 1 }}>{emoji}</div>
+                  <AuthIcon type={emoji} />
                   <div>
                     <div style={{ fontSize: 15.5, fontWeight: 700, color: 'var(--c-ink)', marginBottom: 4, letterSpacing: '-0.01em' }}>{label}</div>
                     <div style={{ fontSize: 13.5, color: 'var(--c-ink-3)', lineHeight: 1.6 }}>{description}</div>
@@ -824,7 +820,7 @@ function PublishPage() {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
                 <div>
                   <FieldLabel label="Configuration summary" />
-                  <div style={{ border: '1.5px solid var(--c-border)', borderRadius: 10, overflow: 'hidden' }}>
+                  <div style={{ border: '1.5px solid var(--c-border)', borderRadius: 'var(--r-md)', overflow: 'hidden' }}>
                     {summaryRows.map(([label, value], index) => (
                       <div key={label} style={{ display: 'grid', gridTemplateColumns: '150px 1fr', borderBottom: index < summaryRows.length - 1 ? '1px solid var(--c-border)' : 'none' }}>
                         <div style={{ padding: '11px 14px', background: 'var(--c-panel-soft)', fontSize: 12, fontWeight: 700, color: 'var(--c-ink-3)', borderRight: '1px solid var(--c-border)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
@@ -842,7 +838,7 @@ function PublishPage() {
                   <FieldLabel label="Gateway preview (Kong YAML)" />
                   <pre style={{
                     margin: 0, padding: '16px 18px', minHeight: 260,
-                    border: '1.5px solid var(--c-border)', borderRadius: 10,
+                    border: '1.5px solid var(--c-border)', borderRadius: 'var(--r-md)',
                     background: '#0d0f14', color: '#c9d1e8',
                     fontSize: 11.5, lineHeight: 1.7,
                     fontFamily: 'var(--f-mono)', whiteSpace: 'pre-wrap',
@@ -855,7 +851,7 @@ function PublishPage() {
               {routeMode === 'operations' && enabledOps.length > 0 && (
                 <div>
                   <FieldLabel label={`Operations to publish (${enabledOps.length})`} />
-                  <div style={{ border: '1.5px solid var(--c-border)', borderRadius: 10, overflow: 'hidden' }}>
+                  <div style={{ border: '1.5px solid var(--c-border)', borderRadius: 'var(--r-md)', overflow: 'hidden' }}>
                     {enabledOps.map((op, i) => (
                       <div key={op.id} style={{
                         display: 'flex', alignItems: 'center', gap: 14,
@@ -881,7 +877,7 @@ function PublishPage() {
           <div style={{
             background: 'linear-gradient(135deg, #111318 0%, #0d0f14 100%)',
             border: '1.5px solid rgba(255,255,255,0.08)',
-            borderRadius: 14, overflow: 'hidden',
+            borderRadius: 'var(--r-xl)', overflow: 'hidden',
             boxShadow: 'var(--shadow-md)',
           }}>
             <div style={{ padding: '20px 22px', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
@@ -895,7 +891,7 @@ function PublishPage() {
                 Step {step + 1} of {STEPS.length} · {completion}% complete
               </div>
               <div style={{ height: 5, background: 'rgba(255,255,255,0.1)', borderRadius: 3, overflow: 'hidden' }}>
-                <div style={{ width: `${completion}%`, height: '100%', background: 'linear-gradient(90deg, var(--accent), #f06a3f)', borderRadius: 3, transition: 'width var(--t-med)' }} />
+                <div style={{ width: `${completion}%`, height: '100%',                    background: 'linear-gradient(90deg, var(--accent), var(--accent-strong))', borderRadius: 3, transition: 'width var(--t-med)' }} />
               </div>
             </div>
 
@@ -917,7 +913,7 @@ function PublishPage() {
           </div>
 
           {/* Tips card */}
-          <div style={{ background: 'var(--c-panel)', border: '1.5px solid var(--c-border)', borderRadius: 14, padding: '18px 20px', boxShadow: 'var(--shadow-sm)' }}>
+          <div style={{ background: 'var(--c-panel)', border: '1.5px solid var(--c-border)',            borderRadius: 'var(--r-lg)', padding: '18px 20px', boxShadow: 'var(--shadow-sm)' }}>
             <div style={{ fontSize: 11.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--c-ink-4)', marginBottom: 12 }}>
               Gateway tips
             </div>
@@ -1032,10 +1028,10 @@ function ToggleRow({ title, description, checked, onChange }: { title: string; d
   return (
     <label style={{
       display: 'flex', justifyContent: 'space-between', gap: 14,
-      padding: '16px 18px', border: '1.5px solid var(--c-border)', borderRadius: 10,
-      background: checked ? 'rgba(232,72,28,0.04)' : 'var(--c-panel)',
+      padding: '16px 18px', border: '1.5px solid var(--c-border)', borderRadius: 'var(--r-md)',
+      background: checked ? 'rgba(26,95,180,0.04)' : 'var(--c-panel)',
       cursor: 'pointer', alignItems: 'center',
-      borderColor: checked ? 'rgba(232,72,28,0.2)' : 'var(--c-border)',
+      borderColor: checked ? 'rgba(26,95,180,0.2)' : 'var(--c-border)',
       transition: 'all var(--t-fast)',
     }}>
       <div>
@@ -1063,8 +1059,8 @@ function sourceCardStyle(active: boolean): CSSProperties {
   return {
     textAlign: 'left', padding: '22px 22px',
     border: `1.5px solid ${active ? 'var(--accent)' : 'var(--c-border)'}`,
-    borderRadius: 12,
-    background: active ? 'rgba(232,72,28,0.04)' : 'var(--c-panel)',
+    borderRadius: 'var(--r-lg)',
+    background: active ? 'rgba(26,95,180,0.04)' : 'var(--c-panel)',
     cursor: 'pointer',
     boxShadow: active ? '0 0 0 3px var(--accent-glow), var(--shadow-sm)' : 'var(--shadow-sm)',
     transition: 'all var(--t-fast)',
@@ -1076,7 +1072,7 @@ function modeSwitchStyle(active: boolean): CSSProperties {
     padding: '10px 20px',
     border: `1.5px solid ${active ? 'var(--accent)' : 'var(--c-border)'}`,
     borderRadius: 8,
-    background: active ? 'rgba(232,72,28,0.08)' : 'var(--c-panel)',
+    background: active ? 'rgba(26,95,180,0.08)' : 'var(--c-panel)',
     color: active ? 'var(--accent)' : 'var(--c-ink-3)',
     fontWeight: 700, fontSize: 14, cursor: 'pointer',
     boxShadow: 'var(--shadow-sm)',
@@ -1100,6 +1096,26 @@ function authLabel(authType: AuthType) {
     case 'jwt': return 'JWT'
     case 'basic': return 'Basic Auth'
     default: return 'Public'
+  }
+}
+
+function AuthIcon({ type }: { type: string }) {
+  const svg = (children: ReactNode) => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--c-ink-4)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      {children}
+    </svg>
+  )
+  switch (type) {
+    case 'key':
+      return svg(<><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></>)
+    case 'oauth':
+      return svg(<><circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="6" /><circle cx="12" cy="12" r="2" /></>)
+    case 'jwt':
+      return svg(<><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2z" /></>)
+    case 'basic':
+      return svg(<><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><circle cx="12" cy="16.5" r="1.5" /></>)
+    default:
+      return svg(<><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></>)
   }
 }
 

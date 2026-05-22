@@ -57,10 +57,10 @@ const VARIANTS: Record<Variant, React.CSSProperties> = {
 }
 
 const SIZES: Record<Size, React.CSSProperties> = {
-  lg: { padding: '13px 22px', fontSize: 15, fontWeight: 700, gap: 8, borderRadius: 9 },
-  md: { padding: '10px 18px', fontSize: 14, fontWeight: 600, gap: 7, borderRadius: 8 },
-  sm: { padding: '8px 14px', fontSize: 13.5, fontWeight: 600, gap: 6, borderRadius: 7 },
-  xs: { padding: '5px 10px', fontSize: 12.5, fontWeight: 600, gap: 5, borderRadius: 6 },
+  lg: { padding: '13px 22px', fontSize: 15, fontWeight: 700, gap: 8, borderRadius: 'var(--r-lg)' },
+  md: { padding: '10px 18px', fontSize: 14, fontWeight: 600, gap: 7, borderRadius: 'var(--r-md)' },
+  sm: { padding: '8px 14px', fontSize: 14, fontWeight: 600, gap: 6, borderRadius: 'var(--r-sm)' },
+  xs: { padding: '5px 10px', fontSize: 13, fontWeight: 600, gap: 5, borderRadius: 'var(--r-sm)' },
 }
 
 export default function Button({ variant = 'default', size = 'md', children, style, disabled, ...props }: ButtonProps) {

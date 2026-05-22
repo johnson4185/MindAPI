@@ -4,5 +4,5 @@ export default function StatusCode({ code }: { code: number }) {
     : code < 500
     ? { color: '#92400E' }
     : { color: '#991B1B' }
-  return <span style={{ fontFamily: 'var(--f-mono)', fontSize: 13, fontWeight: 700, ...s }}>{code}</span>
+  return <span style={{ fontFamily: 'var(--f-mono)', fontSize: 13.5, fontWeight: 700, ...s }}>{code}</span>
 }

@@ -28,7 +28,7 @@ export default function ConsumersPage() {
   const debouncedSearch = useDebounce(search, 180)
 
   const COLUMNS: Column<Consumer>[] = [
-    { key: 'name', label: 'Consumer', render: (_, c) => <><div style={{ fontSize: 14, fontWeight: 700 }}>{c.name}</div><div style={{ fontSize: 12.5, color: 'var(--c-ink-4)', fontFamily: 'var(--f-mono)' }}>{c.id}</div></> },
+    { key: 'name', label: 'Consumer', render: (_, c) => <><div style={{ fontSize: 14, fontWeight: 700 }}>{c.name}</div><div style={{ fontSize: 13, color: 'var(--c-ink-4)', fontFamily: 'var(--f-mono)' }}>{c.id}</div></> },
     { key: 'email', label: 'Email' },
     { key: 'apiKeys', label: 'Keys' },
     { key: 'subscribed', label: 'Subscriptions' },
@@ -123,7 +123,7 @@ export default function ConsumersPage() {
   return (
     <PageLayout>
       <PageHeader
-        eyebrow="Consumers"
+        prefix="Consumers"
         title="Application Access"
         actions={<Button variant="primary" size="lg" onClick={() => setShowCreate(true)} disabled={!canManageConsumers(currentUser.role)}>Add Consumer</Button>}
       />

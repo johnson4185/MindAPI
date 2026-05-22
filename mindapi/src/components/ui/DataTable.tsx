@@ -44,7 +44,6 @@ export function DataTable<T extends Record<string, any>>({
   onRowClick,
   className = '',
   striped = true,
-  hoverable = true,
   selectable = false,
   selectedRows = [],
   onSelectRow,
@@ -103,8 +102,8 @@ export function DataTable<T extends Record<string, any>>({
       <div className="surface-card" style={{ overflow: 'hidden' }}>
         {empty || (
           <div className="empty-state">
-            <div className="empty-state-title">No data available</div>
-            <div className="empty-state-body">There are no records to display.</div>
+            <div className="empty-state-title">Nothing here yet</div>
+            <div className="empty-state-body">No results match your criteria.</div>
           </div>
         )}
       </div>
@@ -145,7 +144,8 @@ export function DataTable<T extends Record<string, any>>({
         </thead>
         <tbody>
           {data.map((item, index) => {
-            const rowKey = String(item[keyField])
+            const rawKey = item[keyField]
+            const rowKey = rawKey != null ? String(rawKey) : `row-${index}`
             const isSelected = selectedRows.includes(rowKey)
 
             return (
@@ -154,23 +154,12 @@ export function DataTable<T extends Record<string, any>>({
                 onClick={() => !selectable && onRowClick?.(item)}
                 style={{
                   background: isSelected
-                    ? 'rgba(232, 72, 28, 0.04)'
+                    ? 'rgba(26, 95, 180, 0.04)'
                     : striped && index % 2 === 1
                       ? 'var(--c-panel-soft)'
                       : undefined,
                   cursor: !selectable && onRowClick ? 'pointer' : undefined,
                   transition: 'background var(--t-fast)',
-                }}
-                onMouseEnter={(e) => {
-                  if (hoverable && onRowClick && !isSelected) {
-                    ;(e.currentTarget as HTMLElement).style.background = 'rgba(59,110,248,0.025)'
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (hoverable && onRowClick && !isSelected) {
-                    ;(e.currentTarget as HTMLElement).style.background =
-                      striped && index % 2 === 1 ? 'var(--c-panel-soft)' : ''
-                  }
                 }}
               >
                 {selectable && (

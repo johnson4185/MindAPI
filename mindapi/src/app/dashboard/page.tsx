@@ -6,6 +6,7 @@ import Button from '@/components/ui/Button'
 import Card from '@/components/ui/Card'
 import { DataTable, Column } from '@/components/ui/DataTable'
 import { StatusBadge } from '@/components/ui/StatusBadge'
+import { apiStatusVariant } from '@/lib/utils'
 import { DashboardSnapshot, API } from '@/lib/types'
 import { useStore } from '@/lib/store'
 import { buildTenantPath } from '@/lib/tenant-routing'
@@ -23,7 +24,7 @@ const API_COLUMNS: Column<API>[] = [
   { key: 'name', label: 'API' },
   { key: 'version', label: 'Version' },
   { key: 'environment', label: 'Environment' },
-  { key: 'status', label: 'Status', render: (v) => <StatusBadge variant={v === 'Active' ? 'success' : v === 'Draft' ? 'info' : 'warning'}>{v as string}</StatusBadge> },
+  { key: 'status', label: 'Status', render: (v) => <StatusBadge variant={apiStatusVariant(v as string)}>{v as string}</StatusBadge> },
 ]
 
 export default function DashboardPage() {
@@ -46,7 +47,7 @@ export default function DashboardPage() {
         </div>
       )}
       <PageHeader
-        eyebrow="Platform Overview"
+        prefix="Dashboard"
         title="Platform Command Center"
         actions={
           <>

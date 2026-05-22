@@ -8,7 +8,7 @@ interface BreadcrumbItem {
 
 export default function Breadcrumb({ items }: { items: BreadcrumbItem[] }) {
   return (
-    <nav style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 16, fontSize: 12.5 }}>
+    <nav style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 18, fontSize: 13 }}>
       {items.map((item, i) => (
         <Fragment key={i}>
           {i > 0 && (

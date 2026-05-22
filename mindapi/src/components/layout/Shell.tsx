@@ -51,7 +51,7 @@ function ShellContent({ children }: { children: ReactNode }) {
           <main style={{ flex: 1, minWidth: 0 }}>
             {blockedSettings ? (
               <div className="page-enter" style={{ padding: 24 }}>
-                <div className="surface-card" style={{ padding: 22 }}>
+                <div className="surface-card" style={{ padding: 24 }}>
                   <div className="eyebrow" style={{ color: 'var(--danger)', marginBottom: 8 }}>Access denied</div>
                   <h3 style={{ marginBottom: 10 }}>Workspace admin permissions required</h3>
                   <p>

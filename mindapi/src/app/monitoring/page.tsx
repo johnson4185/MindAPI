@@ -174,15 +174,15 @@ export default function MonitoringPage() {
   return (
     <PageLayout>
       {tab === 'health' ? (
-        <PageHeader eyebrow="Monitoring" title="Service Health" actions={HEALTH_ACTIONS} />
+        <PageHeader prefix="Monitoring" title="Service Health" actions={HEALTH_ACTIONS} />
       ) : (
-        <PageHeader eyebrow="Monitoring" title="Alert Configuration" actions={ALERTS_ACTIONS} />
+        <PageHeader prefix="Monitoring" title="Alert Configuration" actions={ALERTS_ACTIONS} />
       )}
 
       <Tabs
         tabs={[
           { id: 'health', label: 'Service Health' },
-          { id: 'alerts', label: 'Alert Rules', badge: alertRules.length > 0 ? <span style={{ fontSize: 11, color: 'var(--c-ink-4)', marginLeft: 4 }}>({alertRules.length})</span> : undefined },
+          { id: 'alerts', label: 'Alert Rules', badge: alertRules.length > 0 ? <span style={{ fontSize: 12, color: 'var(--c-ink-4)', marginLeft: 4 }}>({alertRules.length})</span> : undefined },
         ]}
         activeTab={tab}
         onChange={setTab}
@@ -233,11 +233,11 @@ export default function MonitoringPage() {
                 </div>
               </div>
 
-              <Card title="Service status">
+              <Card title="Service status" style={{ marginBottom: 18 }}>
                 <DataTable columns={SERVICE_COLUMNS} data={services} />
               </Card>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 18, marginTop: 18 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 18 }}>
                 <Card title="Health checks">
                   <div style={{ padding: 18 }}>
                     <div style={{ color: 'var(--c-ink-3)', lineHeight: 1.7, marginBottom: 14 }}>
@@ -296,11 +296,11 @@ export default function MonitoringPage() {
             </Card>
           ) : (
             <>
-              <Card title="Alert rules">
+              <Card title="Alert rules" style={{ marginBottom: 18 }}>
                 <DataTable columns={RULE_COLUMNS} data={alertRules} />
               </Card>
 
-              <div style={{ marginTop: 18 }}>
+              <div>
                 <Card title="Notification channels">
                   <div style={{ padding: 18 }}>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 12 }}>

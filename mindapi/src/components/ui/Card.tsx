@@ -25,7 +25,7 @@ export default function Card({ children, title, subtitle, headerRight, style }: 
         >
           <div>
             <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--c-ink)' }}>{title}</div>
-            {subtitle && <div style={{ fontSize: 12.5, color: 'var(--c-ink-4)', marginTop: 4 }}>{subtitle}</div>}
+            {subtitle && <div style={{ fontSize: 13, color: 'var(--c-ink-4)', marginTop: 4 }}>{subtitle}</div>}
           </div>
           {headerRight}
         </div>

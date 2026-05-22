@@ -60,21 +60,16 @@ export default function Sidebar() {
             M
           </div>
           <div>
-            <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: '-0.02em', fontFamily: 'var(--f-display)' }}>MindAPI</div>
-            <div style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.40)', marginTop: 1 }}>
+            <div style={{ fontSize: 16, fontWeight: 700, letterSpacing: '-0.02em', fontFamily: 'var(--f-display)' }}>MindAPI</div>
+            <div style={{ fontSize: 11.5, color: 'rgba(255,255,255,0.40)', marginTop: 1 }}>
               {currentTenant.slug}.mindapi.io
             </div>
           </div>
         </div>
 
-        <div style={{
-          display: 'inline-flex', alignItems: 'center', gap: 5,
-          padding: '3px 9px', borderRadius: 20,
-          background: 'rgba(255,255,255,0.05)',
-        }}>
-          <span style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--success)', flexShrink: 0 }} />
-          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)', fontWeight: 500 }}>{currentUser.role}</span>
-        </div>
+        <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.40)', fontWeight: 500 }}>
+          {currentUser.role}
+        </span>
       </div>
 
       {/* Navigation */}
@@ -90,11 +85,11 @@ export default function Sidebar() {
           return (
             <div key={section} style={{ marginBottom: 14 }}>
               <div style={{
-                padding: '4px 8px 6px',
-                fontSize: 10,
-                fontWeight: 600,
+                padding: '6px 8px 6px',
+                fontSize: 11,
+                fontWeight: 700,
                 textTransform: 'uppercase',
-                letterSpacing: '0.14em',
+                letterSpacing: '0.12em',
                 color: 'rgba(255,255,255,0.35)',
               }}>
                 {section}
@@ -117,8 +112,8 @@ export default function Sidebar() {
                         color: active ? '#fff' : 'rgba(255,255,255,0.55)',
                         transition: 'all var(--t-fast)',
                         textDecoration: 'none',
-                        fontWeight: active ? 600 : 450,
-                        fontSize: 14,
+                        fontWeight: active ? 600 : 500,
+                        fontSize: 14.5,
                         letterSpacing: '-0.01em',
                       }}
                       onMouseEnter={(e) => {
@@ -139,7 +134,7 @@ export default function Sidebar() {
                       <div style={{ minWidth: 0, flex: 1 }}>
                         <div>{route.label}</div>
                         <div style={{
-                          fontSize: 11,
+                          fontSize: 12,
                           color: active ? 'rgba(255,255,255,0.50)' : 'rgba(255,255,255,0.30)',
                           marginTop: 1,
                           fontWeight: 400,
@@ -158,7 +153,7 @@ export default function Sidebar() {
 
       {/* Footer */}
       <div style={{ padding: '10px 18px 14px', borderTop: '1px solid rgba(255,255,255,0.07)' }}>
-        <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', textAlign: 'center', letterSpacing: '0.12em', textTransform: 'uppercase', fontWeight: 600 }}>
+        <div style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.25)', textAlign: 'center', letterSpacing: '0.12em', textTransform: 'uppercase', fontWeight: 700 }}>
           MindAPI Platform
         </div>
       </div>

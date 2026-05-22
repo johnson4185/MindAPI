@@ -29,7 +29,7 @@ function Kbd({ children }: { children: string }) {
       minWidth: 22, height: 20, padding: '0 5px',
       background: 'var(--c-bg)', border: '1px solid var(--c-border)',
       borderBottom: '2px solid var(--c-border)',
-      fontSize: 11, fontWeight: 700, fontFamily: 'var(--f-mono)',
+      fontSize: 12, fontWeight: 700, fontFamily: 'var(--f-mono)',
       color: 'var(--c-ink-2)', lineHeight: 1,
     }}>
       {children}
@@ -77,11 +77,11 @@ export default function KeyboardShortcutsModal() {
         <div style={{ padding: '16px 20px', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 20 }}>
           {SHORTCUTS.map(group => (
             <div key={group.section}>
-              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--c-ink-4)', marginBottom: 10 }}>{group.section}</div>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--c-ink-4)', marginBottom: 10 }}>{group.section}</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {group.items.map(item => (
                   <div key={item.label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-                    <span style={{ fontSize: 12.5, color: 'var(--c-ink-2)' }}>{item.label}</span>
+                    <span style={{ fontSize: 13, color: 'var(--c-ink-2)' }}>{item.label}</span>
                     <div style={{ display: 'flex', gap: 3, flexShrink: 0 }}>
                       {item.keys.map((k, i) => <Kbd key={i}>{k}</Kbd>)}
                     </div>
@@ -91,7 +91,7 @@ export default function KeyboardShortcutsModal() {
             </div>
           ))}
         </div>
-        <div style={{ padding: '10px 20px 14px', borderTop: '1px solid var(--c-border)', fontSize: 12, color: 'var(--c-ink-4)' }}>
+        <div style={{ padding: '10px 20px 14px', borderTop: '1px solid var(--c-border)', fontSize: 12.5, color: 'var(--c-ink-4)' }}>
           Press <strong>Esc</strong> or click outside to close
         </div>
       </div>

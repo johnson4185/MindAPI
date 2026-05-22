@@ -12,7 +12,7 @@ import { Metric } from '@/components/ui/Metric'
 import { useApiData } from '@/hooks/useApiData'
 
 const COLUMNS: Column<GovernancePolicy>[] = [
-  { key: 'name', label: 'Policy', render: (_, p) => <><div style={{ fontWeight: 700, marginBottom: 4 }}>{p.name}</div><div style={{ fontSize: 12.5, color: 'var(--c-ink-4)' }}>{p.description}</div></> },
+  { key: 'name', label: 'Policy', render: (_, p) => <><div style={{ fontWeight: 700, marginBottom: 4 }}>{p.name}</div><div style={{ fontSize: 13, color: 'var(--c-ink-4)' }}>{p.description}</div></> },
   { key: 'severity', label: 'Severity', render: (v) => <StatusBadge variant={v === 'Critical' ? 'error' : v === 'Warning' ? 'warning' : 'success'}>{v as string}</StatusBadge> },
   { key: 'compliance', label: 'Compliance', render: (v) => <span style={{ fontFamily: 'var(--f-mono)', fontWeight: 700 }}>{v}%</span> },
   { key: 'violations', label: 'Violations' },
@@ -39,7 +39,7 @@ export default function GovernancePage() {
         </div>
       )}
       <PageHeader
-        eyebrow="Governance"
+        prefix="Governance"
         title="Governance Center"
         actions={<><Button variant="default" size="lg">Export audit</Button><Button variant="primary" size="lg">Run scan</Button></>}
       />

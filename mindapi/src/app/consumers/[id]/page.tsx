@@ -15,7 +15,7 @@ import { PageLayout } from '@/components/shared/PageLayout'
 
 const KEY_COLUMNS: Column<ConsumerKey>[] = [
   { key: 'name', label: 'Name' },
-  { key: 'value', label: 'Value', render: (v) => <span style={{ fontFamily: 'var(--f-mono)', fontSize: 12.5 }}>{v as string}</span> },
+  { key: 'value', label: 'Value', render: (v) => <span style={{ fontFamily: 'var(--f-mono)', fontSize: 13 }}>{v as string}</span> },
   { key: 'lastUsed', label: 'Last used' },
   { key: 'status', label: 'Status', render: (v) => <StatusBadge variant={v === 'Active' ? 'success' : 'neutral'}>{v as string}</StatusBadge> },
 ]
@@ -87,7 +87,7 @@ export default function ConsumerDetailPage({ params }: { params: Promise<{ id: s
     <PageLayout>
       <Breadcrumb items={[{ label: 'Consumers', href: buildTenantPath(currentTenant.slug, '/consumers') }, { label: consumer.name }]} />
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', gap: 18, alignItems: 'flex-start', flexWrap: 'wrap', marginBottom: 20 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', gap: 18, alignItems: 'flex-start', flexWrap: 'wrap', marginBottom: 18 }}>
         <div>
           <h1 style={{ marginBottom: 10 }}>{consumer.name}</h1>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>

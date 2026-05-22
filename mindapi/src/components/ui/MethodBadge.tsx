@@ -12,7 +12,7 @@ const S: Record<HttpMethod, React.CSSProperties> = {
 
 export default function MethodBadge({ method }: { method: HttpMethod }) {
   return (
-    <span style={{ fontFamily: 'var(--f-mono)', fontSize: 13, fontWeight: 700, letterSpacing: '0.3px', ...S[method] }}>
+    <span style={{ fontFamily: 'var(--f-mono)', fontSize: 13.5, fontWeight: 700, letterSpacing: '0.3px', ...S[method] }}>
       {method}
     </span>
   )

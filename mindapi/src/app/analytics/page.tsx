@@ -38,11 +38,11 @@ export default function AnalyticsPage() {
   return (
     <PageLayout>
       <PageHeader
-        eyebrow="Analytics"
+        prefix="Analytics"
         title="Traffic Intelligence"
         actions={<><Button variant="default" size="lg">Export report</Button><Button variant="primary" size="lg">Create alert</Button></>}
       />
-      {!!error && <div className="surface-card" style={{ padding: 16, marginBottom: 14, borderColor: 'var(--danger-bd)', background: 'var(--danger-bg)', color: 'var(--danger)' }}>{error.message}</div>}
+      {!!error && <div className="surface-card" style={{ padding: 14, marginBottom: 16, borderColor: 'var(--danger-bd)', background: 'var(--danger-bg)', color: 'var(--danger)' }}>{error.message}</div>}
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 14, marginBottom: 18 }}>
         <Metric label="Requests / day" value={displayData.totals.requests} />
@@ -98,7 +98,7 @@ export default function AnalyticsPage() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, minmax(0, 1fr))', gap: 10, padding: 18 }}>
           {displayData.hourlyTraffic.map((point) => (
             <div key={point.hour} style={{ border: '1px solid var(--c-border)', background: 'var(--c-panel-soft)', padding: 12 }}>
-              <div style={{ fontSize: 12, color: 'var(--c-ink-4)', marginBottom: 8 }}>{point.hour}</div>
+              <div style={{ fontSize: 13, color: 'var(--c-ink-4)', marginBottom: 8 }}>{point.hour}</div>
               <div className="metric-value" style={{ fontSize: 18, fontWeight: 700 }}>{point.requests}</div>
             </div>
           ))}

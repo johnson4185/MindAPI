@@ -61,13 +61,13 @@ export default function SettingsPage() {
   return (
     <PageLayout>
       <PageHeader
-        eyebrow="Workspace"
+        prefix="Settings"
         title={`${currentTenant.name} Administration`}
         actions={<Button variant="primary" size="lg" onClick={() => showToast('Mock billing portal opened', 'info')}>Open Billing Portal</Button>}
       />
 
       {!!error && (
-        <div className="surface-card" style={{ padding: 20, marginBottom: 18, borderColor: 'var(--danger-bd)', background: 'var(--danger-bg)', color: 'var(--danger)' }}>
+        <div className="surface-card" style={{ padding: 14, marginBottom: 16, borderColor: 'var(--danger-bd)', background: 'var(--danger-bg)', color: 'var(--danger)' }}>
           {error.message}
         </div>
       )}

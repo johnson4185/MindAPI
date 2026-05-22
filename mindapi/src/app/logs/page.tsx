@@ -13,14 +13,14 @@ import { PageLayout } from '@/components/shared/PageLayout'
 import { useApiData } from '@/hooks/useApiData'
 
 const COLUMNS: Column<LogEntry>[] = [
-  { key: 'timestamp', label: 'Timestamp', render: (v) => <span style={{ fontFamily: 'var(--f-mono)', fontSize: 12 }}>{v as string}</span> },
+  { key: 'timestamp', label: 'Timestamp', render: (v) => <span style={{ fontFamily: 'var(--f-mono)', fontSize: 13 }}>{v as string}</span> },
   { key: 'api', label: 'API' },
   { key: 'method', label: 'Method', render: (v) => <MethodBadge method={v as HttpMethod} /> },
-  { key: 'path', label: 'Path', render: (v) => <span style={{ fontFamily: 'var(--f-mono)', fontSize: 12 }}>{v as string}</span> },
+  { key: 'path', label: 'Path', render: (v) => <span style={{ fontFamily: 'var(--f-mono)', fontSize: 13 }}>{v as string}</span> },
   { key: 'status', label: 'Status', render: (v) => <StatusCode code={v as number} /> },
   { key: 'latency', label: 'Latency' },
   { key: 'consumer', label: 'Consumer' },
-  { key: 'ip', label: 'IP', render: (v) => <span style={{ fontFamily: 'var(--f-mono)', fontSize: 12 }}>{v as string}</span> },
+  { key: 'ip', label: 'IP', render: (v) => <span style={{ fontFamily: 'var(--f-mono)', fontSize: 13 }}>{v as string}</span> },
 ]
 
 export default function LogsPage() {
@@ -80,11 +80,11 @@ export default function LogsPage() {
   return (
     <PageLayout>
       <PageHeader
-        eyebrow="Observability"
+        prefix="Logs"
         title="Runtime Activity"
         actions={<><Button variant="default" size="sm" onClick={() => setLive((value) => !value)}>{live ? 'Pause stream' : 'Resume stream'}</Button><Button variant="primary" size="sm" onClick={() => showToast('Log export queued', 'info')}>Export</Button></>}
       />
-      {!!error && <div className="surface-card" style={{ padding: 16, marginBottom: 14, borderColor: 'var(--danger-bd)', background: 'var(--danger-bg)', color: 'var(--danger)' }}>{error.message}</div>}
+      {!!error && <div className="surface-card" style={{ padding: 14, marginBottom: 16, borderColor: 'var(--danger-bd)', background: 'var(--danger-bg)', color: 'var(--danger)' }}>{error.message}</div>}
 
       {loading && logs.length === 0 ? (
         <div className="surface-card" style={{ padding: 48, textAlign: 'center' }}>
@@ -132,7 +132,7 @@ export default function LogsPage() {
               ['IP', selectedLog.ip],
             ].map(([label, value]) => (
               <div key={label} style={{ display: 'grid', gridTemplateColumns: '100px 1fr', gap: 12, padding: '8px 10px', background: 'var(--c-panel-soft)', border: '1px solid var(--c-border)' }}>
-                <div style={{ fontSize: 12, color: 'var(--c-ink-4)', textTransform: 'uppercase' }}>{label}</div>
+                <div style={{ fontSize: 13, color: 'var(--c-ink-4)', textTransform: 'uppercase' }}>{label}</div>
                 <div style={{ fontSize: 13.5 }}>{value}</div>
               </div>
             ))}

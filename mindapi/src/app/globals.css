@@ -1,4 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;1,14..32,400&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
 :root {
@@ -69,12 +70,12 @@
   --shadow-xl: 0 24px 64px rgba(12, 14, 20, 0.14), 0 8px 20px rgba(12, 14, 20, 0.06);
 
   /* ── Border radius ── */
-  --r-xs: 4px;
-  --r-sm: 6px;
-  --r-md: 8px;
-  --r-lg: 12px;
-  --r-xl: 16px;
-  --r-2xl: 20px;
+  --r-xs: 2px;
+  --r-sm: 4px;
+  --r-md: 6px;
+  --r-lg: 8px;
+  --r-xl: 10px;
+  --r-2xl: 12px;
   --r-pill: 999px;
 
   /* ── Transitions ── */
@@ -83,9 +84,9 @@
   --t-slow: 300ms cubic-bezier(0.2, 0, 0, 1);
 
   /* ── Typography ── */
-  --f-display: "Plus Jakarta Sans", Inter, system-ui, sans-serif;
-  --f-sans: Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
-  --f-mono: "JetBrains Mono", "Cascadia Code", "Fira Code", Consolas, monospace;
+  --f-display: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+  --f-sans: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+  --f-mono: "IBM Plex Mono", "JetBrains Mono", "Cascadia Code", "Fira Code", Consolas, monospace;
 
   /* ── Font sizes ── */
   --fs-hero: 30px;
@@ -94,8 +95,8 @@
   --fs-body: 15px;
   --fs-body-md: 14px;
   --fs-sm: 13px;
-  --fs-tiny: 11px;
-  --fs-caption: 12px;
+  --fs-tiny: 12px;
+  --fs-caption: 13px;
 
   /* ── Focus ring ── */
   --focus-ring: 0 0 0 3px rgba(26, 95, 180, 0.15);
@@ -314,9 +315,9 @@ p {
 
 /* ─── Typography utilities ─── */
 .eyebrow {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.10em;
   text-transform: uppercase;
 }
 

@@ -41,7 +41,7 @@ export default function RateLimitsPage() {
   return (
     <PageLayout>
       <PageHeader
-        eyebrow="Traffic Control"
+        prefix="Traffic"
         title="Quota Controls"
       />
 

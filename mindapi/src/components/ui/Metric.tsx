@@ -40,8 +40,8 @@ export function Metric({ label, value, variant = 'default', hint, icon, subtext,
       {icon && <div style={{ marginBottom: 8, opacity: 0.75 }}>{icon}</div>}
       <div className="eyebrow" style={{ color: colors.label, marginBottom: 10 }}>{label}</div>
       <div className="metric-value" style={{ fontSize: 26, fontWeight: 700, color: colors.value }}>{value}</div>
-      {subtext && <div style={{ fontSize: 12, color: 'var(--c-ink-4)', marginTop: 6 }}>{subtext}</div>}
-      {hint && <div style={{ fontSize: 12, color: 'var(--c-ink-4)', marginTop: 6 }}>{hint}</div>}
+      {subtext && <div style={{ fontSize: 13, color: 'var(--c-ink-4)', marginTop: 6 }}>{subtext}</div>}
+      {hint && <div style={{ fontSize: 13, color: 'var(--c-ink-4)', marginTop: 6 }}>{hint}</div>}
     </div>
   )
 }

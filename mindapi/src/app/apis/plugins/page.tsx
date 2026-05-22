@@ -18,7 +18,7 @@ type PluginRow = {
 }
 
 const COLUMNS: Column<PluginRow>[] = [
-  { key: 'name', label: 'Name', render: (_, p) => <><div style={{ fontWeight: 700, marginBottom: 4 }}>{p.name}</div><div style={{ fontSize: 12.5, color: 'var(--c-ink-4)' }}>{p.desc}</div></> },
+  { key: 'name', label: 'Name', render: (_, p) => <><div style={{ fontWeight: 700, marginBottom: 4 }}>{p.name}</div><div style={{ fontSize: 13, color: 'var(--c-ink-4)' }}>{p.desc}</div></> },
   { key: 'category', label: 'Category', render: (v) => <StatusBadge variant={(v as string) === 'Authentication' ? 'info' : (v as string) === 'Traffic Control' ? 'warning' : 'neutral'}>{v as string}</StatusBadge> },
   { key: 'scope', label: 'Scope' },
   { key: 'source', label: 'Source' },
@@ -40,7 +40,7 @@ export default function PluginsPage() {
   return (
     <PageLayout>
       <PageHeader
-        eyebrow="Policies"
+        prefix="Plugins"
         title="Policy Library"
       />
 

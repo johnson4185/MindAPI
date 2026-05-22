@@ -13,6 +13,7 @@ import { useStore } from '@/lib/store'
 import { canManageApis } from '@/lib/permissions'
 import { buildTenantPath } from '@/lib/tenant-routing'
 import { PageLayout } from '@/components/shared/PageLayout'
+import { apiStatusVariant } from '@/lib/utils'
 import { API } from '@/lib/types'
 
 type APIRow = API & {
@@ -61,19 +62,19 @@ export default function APIsPage() {
     { key: 'name', label: 'API', render: (_, api) => (
       <div>
         <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--c-ink)', marginBottom: 4 }}>{api.name}</div>
-        <div style={{ fontSize: 12.5, color: 'var(--c-ink-4)', fontFamily: 'var(--f-mono)' }}>{api.basePath}</div>
+        <div style={{ fontSize: 13, color: 'var(--c-ink-4)', fontFamily: 'var(--f-mono)' }}>{api.basePath}</div>
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 8 }}>
-          <StatusBadge variant={api.status === 'Active' ? 'success' : api.status === 'Draft' ? 'info' : 'warning'} size="sm">{api.status}</StatusBadge>
+          <StatusBadge variant={apiStatusVariant(api.status)} size="sm">{api.status}</StatusBadge>
           <StatusBadge variant={api.security.length ? 'info' : 'warning'} size="sm">{api.security.join(' / ') || 'Auth missing'}</StatusBadge>
         </div>
       </div>
     ) },
     { key: 'version', label: 'Version', render: (v) => <span style={{ fontFamily: 'var(--f-mono)', color: 'var(--c-ink-3)' }}>{v as string}</span> },
-    { key: 'endpoints', label: 'Endpoints', render: (v) => <><div style={{ fontSize: 14, fontWeight: 700 }}>{v}</div><div style={{ fontSize: 12, color: 'var(--c-ink-4)' }}>Endpoint configs</div></> },
-    { key: 'environment', label: 'Gateway', render: (v) => <><div style={{ fontSize: 13.5, fontWeight: 600 }}>{v as string}</div><div style={{ fontSize: 12, color: 'var(--c-ink-4)' }}>Route, auth, quotas</div></> },
-    { key: 'portal', label: 'Portal', render: (v) => <><div style={{ fontSize: 13.5, fontWeight: 600 }}>{v as string}</div><div style={{ fontSize: 12, color: 'var(--c-ink-4)' }}>Try API enabled</div></> },
-    { key: 'plan', label: 'Plans', render: (v) => <><div style={{ fontSize: 13.5, fontWeight: 600 }}>{v as string}</div><div style={{ fontSize: 12, color: 'var(--c-ink-4)' }}>Usage quotas mapped</div></> },
-    { key: 'owner', label: 'Owner', render: (v) => <><div style={{ fontSize: 13.5, fontWeight: 600 }}>{v as string}</div><div style={{ fontSize: 12, color: 'var(--c-ink-4)' }}>Workspace role owner</div></> },
+    { key: 'endpoints', label: 'Endpoints', render: (v) => <><div style={{ fontSize: 14, fontWeight: 700 }}>{v}</div><div style={{ fontSize: 13, color: 'var(--c-ink-4)' }}>Endpoint configs</div></> },
+    { key: 'environment', label: 'Gateway', render: (v) => <><div style={{ fontSize: 13.5, fontWeight: 600 }}>{v as string}</div><div style={{ fontSize: 13, color: 'var(--c-ink-4)' }}>Route, auth, quotas</div></> },
+    { key: 'portal', label: 'Portal', render: (v) => <><div style={{ fontSize: 13.5, fontWeight: 600 }}>{v as string}</div><div style={{ fontSize: 13, color: 'var(--c-ink-4)' }}>Try API enabled</div></> },
+    { key: 'plan', label: 'Plans', render: (v) => <><div style={{ fontSize: 13.5, fontWeight: 600 }}>{v as string}</div><div style={{ fontSize: 13, color: 'var(--c-ink-4)' }}>Usage quotas mapped</div></> },
+    { key: 'owner', label: 'Owner', render: (v) => <><div style={{ fontSize: 13.5, fontWeight: 600 }}>{v as string}</div><div style={{ fontSize: 13, color: 'var(--c-ink-4)' }}>Workspace role owner</div></> },
     { key: 'updatedAt', label: 'Updated' },
     { key: 'id', label: 'Actions', render: (_, api) => (
       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
@@ -106,7 +107,7 @@ export default function APIsPage() {
   return (
     <PageLayout>
       <PageHeader
-        eyebrow="API Publishing"
+        prefix="APIs"
         title="API Portfolio"
         actions={
           <>

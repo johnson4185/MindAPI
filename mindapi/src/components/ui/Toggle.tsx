@@ -63,7 +63,7 @@ export default function Toggle({ checked, onChange, disabled = false, label, des
       {(label || description) && (
         <span style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
           {label && <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--c-ink)' }}>{label}</span>}
-          {description && <span style={{ fontSize: 12.5, color: 'var(--c-ink-4)' }}>{description}</span>}
+          {description && <span style={{ fontSize: 13, color: 'var(--c-ink-4)' }}>{description}</span>}
         </span>
       )}
     </label>

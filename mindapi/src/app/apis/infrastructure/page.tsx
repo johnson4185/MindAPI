@@ -5,6 +5,7 @@ import Card from '@/components/ui/Card'
 import { DataTable, Column } from '@/components/ui/DataTable'
 import { Metric } from '@/components/ui/Metric'
 import { StatusBadge } from '@/components/ui/StatusBadge'
+import { apiStatusVariant } from '@/lib/utils'
 import { useStore } from '@/lib/store'
 import { PageLayout } from '@/components/shared/PageLayout'
 import { API } from '@/lib/types'
@@ -12,9 +13,9 @@ import { API } from '@/lib/types'
 const COLUMNS: Column<API>[] = [
   { key: 'name', label: 'API', render: (_, api) => <strong>{api.name}</strong> },
   { key: 'basePath', label: 'Public path', render: (v) => <span style={{ fontFamily: 'var(--f-mono)', fontSize: 13 }}>{v as string}</span> },
-  { key: 'backendUrl', label: 'Backend target', render: (v) => <span style={{ fontFamily: 'var(--f-mono)', fontSize: 12.5 }}>{v as string}</span> },
+  { key: 'backendUrl', label: 'Backend target', render: (v) => <span style={{ fontFamily: 'var(--f-mono)', fontSize: 13 }}>{v as string}</span> },
   { key: 'environment', label: 'Environment' },
-  { key: 'status', label: 'Status', render: (v) => <StatusBadge variant={(v as string) === 'Active' ? 'success' : (v as string) === 'Draft' ? 'info' : 'warning'}>{v as string}</StatusBadge> },
+  { key: 'status', label: 'Status', render: (v) => <StatusBadge variant={apiStatusVariant(v as string)}>{v as string}</StatusBadge> },
 ]
 
 export default function InfrastructurePage() {
@@ -25,7 +26,7 @@ export default function InfrastructurePage() {
   return (
     <PageLayout>
       <PageHeader
-        eyebrow="Gateway"
+        prefix="Gateway"
         title="Gateway Topology"
       />
 

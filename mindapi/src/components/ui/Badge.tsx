@@ -31,7 +31,7 @@ export default function Badge({ variant, children, dot = false }: BadgeProps) {
         fontWeight: 700,
       }}
     >
-      {dot && <span style={{ width: 6, height: 6, background: color, flexShrink: 0 }} />}
+      {dot && <span style={{ width: 6, height: 6, borderRadius: '50%', background: color, flexShrink: 0 }} />}
       {children}
     </span>
   )
